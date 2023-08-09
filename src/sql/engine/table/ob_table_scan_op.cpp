@@ -3235,8 +3235,8 @@ int ObGlobalIndexLookupOpImpl::do_index_lookup()
 {
   int ret = das_ref_.execute_all_task();
 
-  if (MY_SPEC.use_row_cache_) {
-	  LOG_DEBUG("use row cache can be passed on", K(MY_SPEC.use_row_cache_));
+  if (get_lookup_ctdef()->use_row_cache_) {
+	  LOG_DEBUG("use row cache can be passed on", K(get_lookup_ctdef()->use_row_cache_));
   }
 
   if (OB_SUCC(ret)) {
