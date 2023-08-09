@@ -266,6 +266,7 @@ struct ObGlobalHint {
   ObOptimizerStatisticsGatheringHint osg_hint_;
   bool has_dbms_stats_hint_;
   bool flashback_read_tx_uncommitted_;
+  bool use_row_cache_;
   int64_t dynamic_sampling_;
 };
 

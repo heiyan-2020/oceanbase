@@ -12355,6 +12355,10 @@ int ObDMLResolver::resolve_global_hint(const ParseNode &hint_node,
 
 
   switch (hint_node.type_) {
+    case T_ROW_CACHE: {
+      global_hint.use_row_cache_ = true;
+      break;
+    }
     case T_TOPK: {
       CHECK_HINT_PARAM(hint_node, 2) {
         global_hint.merge_topk_hint(child0->value_, child1->value_);

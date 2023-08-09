@@ -3884,6 +3884,9 @@ int ObStaticEngineCG::generate_normal_tsc(ObLogTableScan &op, ObTableScanSpec &s
     spec.ref_table_id_ = op.get_ref_table_id();
     spec.is_index_global_ = op.get_is_index_global();
     spec.frozen_version_ = op.get_plan()->get_optimizer_context().get_global_hint().frozen_version_;
+    spec.use_row_cache_ = op.get_plan()->get_optimizer_context().get_global_hint().use_row_cache_;
+    // TODO: remove redundant log messages.
+    LOG_WARN("use row cache", K(spec.use_row_cache_));
     spec.force_refresh_lc_ = op.get_plan()->get_optimizer_context().get_global_hint().force_refresh_lc_;
     spec.use_dist_das_ = op.use_das();
     spec.batch_scan_flag_ = op.use_batch();

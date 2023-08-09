@@ -283,6 +283,7 @@ public:
   ObExpr *limit_;
   ObExpr *offset_;
   int64_t frozen_version_; // from hint
+  bool use_row_cache_; // from hint
 
   //
   // for dynamic query range prune
