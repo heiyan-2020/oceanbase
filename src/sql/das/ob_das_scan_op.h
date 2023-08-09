@@ -89,6 +89,7 @@ public:
   sql::ExprFixedArray result_output_;
   bool is_get_;
   bool is_external_table_;
+  bool use_row_cache_;
   ObExternalFileFormat::StringData external_file_access_info_;
   ObExternalFileFormat::StringData external_file_location_;
   ExternalFileNameArray external_files_; //for external table scan TODO jim.wjh remove
