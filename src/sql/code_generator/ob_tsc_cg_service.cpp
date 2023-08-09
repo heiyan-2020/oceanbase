@@ -29,6 +29,7 @@ int ObTscCgService::generate_tsc_ctdef(ObLogTableScan &op, ObTableScanCtDef &tsc
   int ret = OB_SUCCESS;
   ObDASScanCtDef &scan_ctdef = tsc_ctdef.scan_ctdef_;
   ObQueryFlag query_flag;
+
   if (op.is_need_feedback() &&
       (op.get_plan()->get_optimizer_context().get_phy_plan_type() == OB_PHY_PLAN_LOCAL ||
         op.get_plan()->get_optimizer_context().get_phy_plan_type() == OB_PHY_PLAN_REMOTE)) {
@@ -138,6 +139,7 @@ int ObTscCgService::generate_tsc_ctdef(ObLogTableScan &op, ObTableScanCtDef &tsc
       ObSqlSchemaGuard *schema_guard = cg_.opt_ctx_->get_sql_schema_guard();
       tsc_ctdef.lookup_ctdef_ = new(lookup_buf) ObDASScanCtDef(cg_.phy_plan_->get_allocator());
       tsc_ctdef.lookup_ctdef_->ref_table_id_ = op.get_real_ref_table_id();
+      tsc_ctdef.lookup_ctdef_->use_row_cache_ = op.get_plan()->get_optimizer_context().get_global_hint().use_row_cache_;
       tsc_ctdef.lookup_loc_meta_ = new(loc_meta_buf) ObDASTableLocMeta(cg_.phy_plan_->get_allocator());
 
       if (OB_FAIL(generate_das_scan_ctdef(op, *tsc_ctdef.lookup_ctdef_, has_rowscn))) {
@@ -850,6 +852,7 @@ int ObTscCgService::generate_das_scan_ctdef(const ObLogTableScan &op,
       LOG_WARN("generate table param failed", K(ret));
     }
   }
+
   return ret;
 }
 
