@@ -15,6 +15,7 @@
 
 #include "share/cache/ob_kv_storecache.h"
 #include "common/rowkey/ob_rowkey.h"
+#include "storage/access/ob_table_read_info.h"
 
 namespace oceanbase
 {
@@ -24,11 +25,9 @@ namespace sql
 class ObDASCacheKey : public common::ObIKVCacheKey
 {
 public:
-	ObDASCacheKey(
-      const uint64_t tenant_id,
-      const ObTabletID &tablet_id,
-      const ObRowkey &rowkey) : tenant_id_(tenant_id), tablet_id_(tablet_id), rowkey_(rowkey), rowkey_size_(rowkey.get_deep_copy_size()) {}
+  ObDASCacheKey() = default;
   virtual ~ObDASCacheKey() = default;
+  int init(uint64_t tenant_id, ObTabletID &tablet_id, ObRowkey &rowkey);
   virtual int equal(const ObIKVCacheKey &other, bool &equal) const override;
   virtual int hash(uint64_t &hash_value) const override;
   virtual uint64_t get_tenant_id() const override;
@@ -77,6 +76,8 @@ public:
   static ObDASCache &get_instance();
   int get_row(const ObDASCacheKey &key, ObDASCacheValueHandler &handle);
   int put_row(const ObDASCacheKey &key, ObDASCacheValue &value);
+
+  ObArenaAllocator rowkey_allocator_;
 private:
   DISALLOW_COPY_AND_ASSIGN(ObDASCache);
 };
@@ -84,17 +85,17 @@ private:
 
 class ObDASCacheFetcher {
 public:
-  ObDASCacheFetcher(ObTabletID &tablet_id) : tablet_id_(tablet_id) {}
+  ObDASCacheFetcher() = default;
   ~ObDASCacheFetcher() = default;
+  int init(ObTabletID &tablet_id);
   int get_row(const ObRowkey &key, ObDASCacheValueHandler &handle);
-  int put_row(const ObEvalCtx &ctx, const common::ObIArray<ObExpr*> &exprs);
+  int put_row(const ObChunkDatumStore::StoredRow *row, storage::ColDescArray *desc);
 
 private:
   /**
    * Extract primary key of a row.
    */
-  int extract_key(const ObEvalCtx &ctx, const common::ObIArray<ObExpr*> &exprs, ObRowkey &key);
-
+  int extract_key(const ObChunkDatumStore::StoredRow *row, storage::ColDescArray *desc, ObRowkey &key);
 private:
   ObTabletID tablet_id_;
 };

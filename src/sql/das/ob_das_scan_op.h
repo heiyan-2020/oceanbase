@@ -263,7 +263,7 @@ public:
   virtual int get_next_rows(int64_t &count, int64_t capacity) override;
   virtual void reset() override;
   virtual int link_extra_result(ObDASExtraData &extra_result) override;
-  int init_result_iter(const ExprFixedArray *output_exprs, ObEvalCtx *eval_ctx, ColDescArray *descs);
+  int init_result_iter(const ExprFixedArray *output_exprs, ObEvalCtx *eval_ctx, ColDescArray *descs, bool use_row_cache);
   ObChunkDatumStore &get_datum_store() { return datum_store_; }
   INHERIT_TO_STRING_KV("ObIDASTaskResult", ObIDASTaskResult,
                        K_(datum_store),
@@ -275,8 +275,11 @@ private:
   ObEvalCtx *eval_ctx_;
   ColDescArray *desc_;
   ObDASExtraData *extra_result_;
+  common::ObTabletID tablet_id_;
+  ObDASCacheFetcher cache_fetcher_;
 
   bool need_check_output_datum_;
+  bool use_row_cache_;
 };
 class ObLocalIndexLookupOp : public common::ObNewRowIterator, public ObIndexLookupOpImpl
 {

@@ -19,6 +19,17 @@ namespace oceanbase
 namespace sql
 {
 
+
+int ObDASCacheKey::init(uint64_t tenant_id, ObTabletID &tablet_id, ObRowkey &rowkey) {
+  int ret = OB_SUCCESS;
+  tenant_id_ = tenant_id;
+  tablet_id_ = tablet_id;
+  rowkey_ = rowkey;
+  rowkey_size_ = rowkey_.get_deep_copy_size();
+
+  return ret;
+}
+
 int ObDASCacheKey::equal(const ObIKVCacheKey &other, bool &equal) const {
   int ret = OB_SUCCESS;
   const ObDASCacheKey &other_key = reinterpret_cast<const ObDASCacheKey &>(other);
@@ -166,17 +177,28 @@ int ObDASCache::put_row(const ObDASCacheKey &key, ObDASCacheValue &value) {
   return ret;
 }
 
+int ObDASCacheFetcher::init(ObTabletID &tablet_id) {
+  tablet_id_ = tablet_id;
+  int ret = OB_SUCCESS;
+  return ret;
+}
+
 int ObDASCacheFetcher::get_row(const ObRowkey &key, ObDASCacheValueHandler &handle) {
   int ret = OB_SUCCESS;
   return ret;
 }
 
-int ObDASCacheFetcher::put_row(const ObEvalCtx &ctx, const common::ObIArray<ObExpr*> &exprs) {
+int ObDASCacheFetcher::put_row(const ObChunkDatumStore::StoredRow *row, storage::ColDescArray *desc) {
   int ret = OB_SUCCESS;
 
-  ObDASCacheKey cache_key(MTL_ID(), tablet_id_, key);
+  ObRowkey rowkey;
+  ObDASCacheKey cache_key;
   ObDASCacheValue cache_value;
-  if (OB_FAIL(cache_value.init(row))) {
+  if (OB_FAIL(extract_key(row, desc, rowkey))) {
+    LOG_WARN("Failed to extract cache key", K(ret));
+  } else if (OB_FAIL(cache_key.init(MTL_ID(), tablet_id_, rowkey))) {
+    LOG_WARN("Failed to init cache key", K(ret));
+  } else if (OB_FAIL(cache_value.init(row))) {
     LOG_WARN("Failed to init cache value", K(ret));
   } else if (OB_FAIL(ObDASCache::get_instance().put_row(cache_key, cache_value))) {
     LOG_WARN("Failed to init put cache", K(ret));
@@ -186,17 +208,25 @@ int ObDASCacheFetcher::put_row(const ObEvalCtx &ctx, const common::ObIArray<ObEx
   return ret;
 }
 
-int ObDASCacheFetcher::extract_key(ObEvalCtx &ctx, const common::ObIArray<ObExpr*> &exprs, ObRowkey &key) {
+int ObDASCacheFetcher::extract_key(const ObChunkDatumStore::StoredRow *row, storage::ColDescArray *desc, ObRowkey &key) {
   int ret = OB_SUCCESS;
   // In this temporary version, we assume that `exprs` represents full row and the first expr is primary key.
-  if (exprs.count() <= 0) {
+  if (row.cells() == nullptr) {
     ret = OB_ERROR;
-    LOG_WARN("exprs array is empty", K(exprs));
+    LOG_WARN("storerow is empty", K(exprs));
   } else {
-    const ObExpr* pk_expr = exprs.at(0);
-    ObDatum &pk = pk_expr->locate_expr_datum(ctx);
+    ObDatum &pk = row->cells()[0];
+    common::ObObjMeta pk_meta = desc->at(0).col_type_;
+    // TODO: @kongye don't allocate memory this way, try to reuse the allocator of KVCache
+    common::ObIAllocator &allocator = ObDASCache::get_instance().rowkey_allocator_;
+    ObObj* ptr = reinterpret_cast<common::ObObj*>(allocator.alloc(sizeof(sizeof(common::ObObj))));
+    pk.to_obj(*ptr, pk_meta);
+    // assume primary key is one column.
+    key.assign(ptr, 1);
   }
+  return ret;
 }
+
 
 
 } // namespace sql
