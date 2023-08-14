@@ -24,11 +24,10 @@ namespace sql
 class ObDASCacheKey : public common::ObIKVCacheKey
 {
 public:
-	ObDASCacheKey();
 	ObDASCacheKey(
       const uint64_t tenant_id,
       const ObTabletID &tablet_id,
-      const ObRowKey &rowkey);
+      const ObRowkey &rowkey) : tenant_id_(tenant_id), tablet_id_(tablet_id), rowkey_(rowkey), rowkey_size_(rowkey.get_deep_copy_size()) {}
   virtual ~ObDASCacheKey() = default;
   virtual int equal(const ObIKVCacheKey &other, bool &equal) const override;
   virtual int hash(uint64_t &hash_value) const override;
@@ -36,42 +35,61 @@ public:
   virtual int64_t size() const override;
   virtual int deep_copy(char *buf, const int64_t buf_len, ObIKVCacheKey *&key) const override;
   bool is_valid() const;
-  TO_STRING_KV(K_(tenant_id), K_(tablet_id), K_(rowkey_size), K_(rowkey));
+  TO_STRING_KV(K_(tenant_id), K_(tablet_id), K_(rowkey));
 private:
   uint64_t tenant_id_;
   ObTabletID tablet_id_;
-  int64_t rowkey_size_;
-  ObRowKey rowkey_;
+  ObRowkey rowkey_;
+  uint64_t rowkey_size_;
   DISALLOW_COPY_AND_ASSIGN(ObDASCacheKey);
 };
 
+
 class ObDASCacheValue : public common::ObIKVCacheValue
 {
-//public:
-//	ObDASCacheValue();
-//  virtual ~ObDASCacheValue() = default;
-//  int init(const blocksstable::ObDatumRow &row, const int64_t read_snapshot_version);
-//  virtual int64_t size() const override;
-//  virtual int deep_copy(char *buf, const int64_t buf_len, ObIKVCacheValue *&value) const override;
-//  bool is_valid() const { return (nullptr != datums_ && 0 != column_cnt_) || (nullptr == datums_ && 0 == column_cnt_); }
-//  OB_INLINE ObStorageDatum *get_datums() const { return datums_; }
-//  OB_INLINE int64_t get_column_cnt() const { return column_cnt_; }
-//  OB_INLINE int64_t get_read_snapshot_version() const { return read_snapshot_version_; }
-//  ObDmlRowFlag get_flag() const { return flag_; }
-//  TO_STRING_KV(KP_(datums), K_(size), K_(column_cnt), K_(read_snapshot_version), K_(flag));
-//private:
-//  ObStorageDatum *datums_;
-//  int64_t size_;
-//  int32_t column_cnt_;
-//  int64_t read_snapshot_version_;
-//  ObDmlRowFlag flag_;
+public:
+  ObDASCacheValue();
+  virtual ~ObDASCacheValue() = default;
+  int init(ObChunkDatumStore::StoredRow &row);
+  virtual int64_t size() const override;
+  bool is_valid() const { return (nullptr != datums_ && 0 != col_cnt_) || (nullptr == datums_ && 0 == col_cnt_); }
+  virtual int deep_copy(char *buf, const int64_t buf_len, ObIKVCacheValue *&value) const override;
+private:
+  uint32_t col_cnt_;
+  uint32_t row_size_;
+  ObDatum *datums_;
 };
+
+struct ObDASCacheValueHandler
+{
+	ObDASCacheValueHandler() : value_(nullptr), handle_() {}
+	~ObDASCacheValueHandler() = default;
+	ObDASCacheValue *value_;
+	ObKVCacheHandle handle_;
+};
+
+
 
 class ObDASCache : public common::ObKVCache<ObDASCacheKey, ObDASCacheValue> {
 public:
-
+  ObDASCache() = default;
+  virtual ~ObDASCache() = default;
+  static ObDASCache &get_instance();
+  int get_row(const ObDASCacheKey &key, ObDASCacheValueHandler &handle);
+  int put_row(const ObDASCacheKey &key, ObDASCacheValue &value);
 private:
+  DISALLOW_COPY_AND_ASSIGN(ObDASCache);
+};
 
+
+class ObDASCacheFetcher {
+public:
+  ObDASCacheFetcher(ObTabletID &tablet_id) : tablet_id_(tablet_id) {}
+  ~ObDASCacheFetcher() = default;
+  int get_row(const ObRowkey &key, ObDASCacheValueHandler &handle);
+  int put_row(const ObRowkey &key, ObChunkDatumStore::StoredRow &row);
+private:
+  ObTabletID tablet_id_;
 };
 
 }  // namespace sql
