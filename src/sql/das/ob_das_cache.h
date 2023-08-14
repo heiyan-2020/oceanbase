@@ -87,7 +87,14 @@ public:
   ObDASCacheFetcher(ObTabletID &tablet_id) : tablet_id_(tablet_id) {}
   ~ObDASCacheFetcher() = default;
   int get_row(const ObRowkey &key, ObDASCacheValueHandler &handle);
-  int put_row(const ObRowkey &key, ObChunkDatumStore::StoredRow &row);
+  int put_row(const ObEvalCtx &ctx, const common::ObIArray<ObExpr*> &exprs);
+
+private:
+  /**
+   * Extract primary key of a row.
+   */
+  int extract_key(const ObEvalCtx &ctx, const common::ObIArray<ObExpr*> &exprs, ObRowkey &key);
+
 private:
   ObTabletID tablet_id_;
 };

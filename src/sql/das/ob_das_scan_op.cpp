@@ -512,7 +512,7 @@ int ObDASScanOp::decode_task_result(ObIDASTaskResult *task_result)
   }
   ObDASScanResult *scan_result = static_cast<ObDASScanResult*>(task_result);
   if (OB_FAIL(scan_result->init_result_iter(&get_result_outputs(),
-                                            &(scan_rtdef_->p_pd_expr_op_->get_eval_ctx())))) {
+                                            &(scan_rtdef_->p_pd_expr_op_->get_eval_ctx()), &(scan_ctdef_->table_param_.main_read_info_.cols_desc_)))) {
     LOG_WARN("init scan result iterator failed", K(ret));
   } else {
     result_ = scan_result;
@@ -536,6 +536,7 @@ int ObDASScanOp::fill_task_result(ObIDASTaskResult &task_result, bool &has_more,
     ObEvalCtx &eval_ctx = scan_rtdef_->p_pd_expr_op_->get_eval_ctx();
     if (!scan_rtdef_->p_pd_expr_op_->is_vectorized()) {
       scan_rtdef_->p_pd_expr_op_->clear_evaluated_flag();
+      // 代码可读性无敌了... eval_ctx 在
       if (OB_FAIL(get_output_result_iter()->get_next_row())) {
         if (OB_ITER_END != ret) {
           LOG_WARN("get next row from result failed", K(ret));
@@ -784,11 +785,12 @@ void ObDASScanResult::reset()
   eval_ctx_ = nullptr;
 }
 
-int ObDASScanResult::init_result_iter(const ExprFixedArray *output_exprs, ObEvalCtx *eval_ctx)
+int ObDASScanResult::init_result_iter(const ExprFixedArray *output_exprs, ObEvalCtx *eval_ctx, ColDescArray *descs)
 {
   int ret = OB_SUCCESS;
   output_exprs_ = output_exprs;
   eval_ctx_ = eval_ctx;
+  desc_ = descs;
   if (OB_FAIL(datum_store_.begin(result_iter_))) {
     LOG_WARN("begin datum result iterator failed", K(ret));
   }

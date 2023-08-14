@@ -171,7 +171,7 @@ int ObDASCacheFetcher::get_row(const ObRowkey &key, ObDASCacheValueHandler &hand
   return ret;
 }
 
-int ObDASCacheFetcher::put_row(const ObRowkey &key, ObChunkDatumStore::StoredRow &row) {
+int ObDASCacheFetcher::put_row(const ObEvalCtx &ctx, const common::ObIArray<ObExpr*> &exprs) {
   int ret = OB_SUCCESS;
 
   ObDASCacheKey cache_key(MTL_ID(), tablet_id_, key);
@@ -184,6 +184,18 @@ int ObDASCacheFetcher::put_row(const ObRowkey &key, ObChunkDatumStore::StoredRow
     LOG_DEBUG("update row cache successfully", K(cache_key));
   }
   return ret;
+}
+
+int ObDASCacheFetcher::extract_key(ObEvalCtx &ctx, const common::ObIArray<ObExpr*> &exprs, ObRowkey &key) {
+  int ret = OB_SUCCESS;
+  // In this temporary version, we assume that `exprs` represents full row and the first expr is primary key.
+  if (exprs.count() <= 0) {
+    ret = OB_ERROR;
+    LOG_WARN("exprs array is empty", K(exprs));
+  } else {
+    const ObExpr* pk_expr = exprs.at(0);
+    ObDatum &pk = pk_expr->locate_expr_datum(ctx);
+  }
 }
 
 

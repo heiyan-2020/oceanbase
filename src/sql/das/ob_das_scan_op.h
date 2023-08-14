@@ -263,7 +263,7 @@ public:
   virtual int get_next_rows(int64_t &count, int64_t capacity) override;
   virtual void reset() override;
   virtual int link_extra_result(ObDASExtraData &extra_result) override;
-  int init_result_iter(const ExprFixedArray *output_exprs, ObEvalCtx *eval_ctx);
+  int init_result_iter(const ExprFixedArray *output_exprs, ObEvalCtx *eval_ctx, ColDescArray *descs);
   ObChunkDatumStore &get_datum_store() { return datum_store_; }
   INHERIT_TO_STRING_KV("ObIDASTaskResult", ObIDASTaskResult,
                        K_(datum_store),
@@ -273,7 +273,9 @@ private:
   ObChunkDatumStore::Iterator result_iter_;
   const ExprFixedArray *output_exprs_;
   ObEvalCtx *eval_ctx_;
+  ColDescArray *desc_;
   ObDASExtraData *extra_result_;
+
   bool need_check_output_datum_;
 };
 class ObLocalIndexLookupOp : public common::ObNewRowIterator, public ObIndexLookupOpImpl
