@@ -40,6 +40,7 @@ ob_set_subtarget(ob_sql common_mixed
 )
 
 ob_set_subtarget(ob_sql das
+  das/ob_das_cache.cpp
   das/ob_group_scan_iter.cpp
   das/ob_das_group_scan_op.cpp
   das/ob_das_context.cpp

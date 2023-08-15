@@ -96,11 +96,11 @@ int ObDASCacheKey::deep_copy(char *buf, const int64_t buf_len, ObIKVCacheKey *&k
 }
 
 bool ObDASCacheKey::is_valid() const {
-  OB_LIKELY(tenant_id_ != 0 && tablet_id_.is_valid() && rowkey_size_ > 0);
+  return OB_LIKELY(tenant_id_ != 0 && tablet_id_.is_valid() && rowkey_size_ > 0);
 }
 
 
-int ObDASCacheValue::init(ObChunkDatumStore::StoredRow &row) {
+int ObDASCacheValue::init(const ObChunkDatumStore::StoredRow &row) {
 	int ret = OB_SUCCESS;
 
 	// TODO: @kongye add more sanity check.
@@ -188,7 +188,7 @@ int ObDASCacheFetcher::get_row(const ObRowkey &key, ObDASCacheValueHandler &hand
   return ret;
 }
 
-int ObDASCacheFetcher::put_row(const ObChunkDatumStore::StoredRow *row, storage::ColDescArray *desc) {
+int ObDASCacheFetcher::put_row(const ObChunkDatumStore::StoredRow *row, const ObIArray<ObColDesc> *desc) {
   int ret = OB_SUCCESS;
 
   ObRowkey rowkey;
@@ -198,7 +198,7 @@ int ObDASCacheFetcher::put_row(const ObChunkDatumStore::StoredRow *row, storage:
     LOG_WARN("Failed to extract cache key", K(ret));
   } else if (OB_FAIL(cache_key.init(MTL_ID(), tablet_id_, rowkey))) {
     LOG_WARN("Failed to init cache key", K(ret));
-  } else if (OB_FAIL(cache_value.init(row))) {
+  } else if (OB_FAIL(cache_value.init(*row))) {
     LOG_WARN("Failed to init cache value", K(ret));
   } else if (OB_FAIL(ObDASCache::get_instance().put_row(cache_key, cache_value))) {
     LOG_WARN("Failed to init put cache", K(ret));
@@ -208,15 +208,15 @@ int ObDASCacheFetcher::put_row(const ObChunkDatumStore::StoredRow *row, storage:
   return ret;
 }
 
-int ObDASCacheFetcher::extract_key(const ObChunkDatumStore::StoredRow *row, storage::ColDescArray *desc, ObRowkey &key) {
+int ObDASCacheFetcher::extract_key(const ObChunkDatumStore::StoredRow *row, const ObIArray<ObColDesc> *desc, ObRowkey &key) {
   int ret = OB_SUCCESS;
   // In this temporary version, we assume that `exprs` represents full row and the first expr is primary key.
-  if (row.cells() == nullptr) {
+  if (row->cells() == nullptr) {
     ret = OB_ERROR;
-    LOG_WARN("storerow is empty", K(exprs));
+    LOG_WARN("storerow is empty", K(ret));
   } else {
-    ObDatum &pk = row->cells()[0];
-    common::ObObjMeta pk_meta = desc->at(0).col_type_;
+    const ObDatum &pk = row->cells()[0];
+    const common::ObObjMeta pk_meta = desc->at(0).col_type_;
     // TODO: @kongye don't allocate memory this way, try to reuse the allocator of KVCache
     common::ObIAllocator &allocator = ObDASCache::get_instance().rowkey_allocator_;
     ObObj* ptr = reinterpret_cast<common::ObObj*>(allocator.alloc(sizeof(sizeof(common::ObObj))));

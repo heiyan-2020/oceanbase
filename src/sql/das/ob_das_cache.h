@@ -16,6 +16,7 @@
 #include "share/cache/ob_kv_storecache.h"
 #include "common/rowkey/ob_rowkey.h"
 #include "storage/access/ob_table_read_info.h"
+#include "sql/engine/basic/ob_chunk_datum_store.h"
 
 namespace oceanbase
 {
@@ -49,10 +50,11 @@ class ObDASCacheValue : public common::ObIKVCacheValue
 public:
   ObDASCacheValue();
   virtual ~ObDASCacheValue() = default;
-  int init(ObChunkDatumStore::StoredRow &row);
+  int init(const ObChunkDatumStore::StoredRow &row);
   virtual int64_t size() const override;
   bool is_valid() const { return (nullptr != datums_ && 0 != col_cnt_) || (nullptr == datums_ && 0 == col_cnt_); }
   virtual int deep_copy(char *buf, const int64_t buf_len, ObIKVCacheValue *&value) const override;
+  TO_STRING_KV(KP_(datums), K_(col_cnt), K_(row_size));
 private:
   uint32_t col_cnt_;
   uint32_t row_size_;
@@ -89,13 +91,13 @@ public:
   ~ObDASCacheFetcher() = default;
   int init(ObTabletID &tablet_id);
   int get_row(const ObRowkey &key, ObDASCacheValueHandler &handle);
-  int put_row(const ObChunkDatumStore::StoredRow *row, storage::ColDescArray *desc);
+  int put_row(const ObChunkDatumStore::StoredRow *row, const ObIArray<ObColDesc> *desc);
 
 private:
   /**
    * Extract primary key of a row.
    */
-  int extract_key(const ObChunkDatumStore::StoredRow *row, storage::ColDescArray *desc, ObRowkey &key);
+  int extract_key(const ObChunkDatumStore::StoredRow *row, const ObIArray<ObColDesc> *desc, ObRowkey &key);
 private:
   ObTabletID tablet_id_;
 };

@@ -511,7 +511,7 @@ int ObDASScanOp::decode_task_result(ObIDASTaskResult *task_result)
     reset_access_datums_ptr();
   }
   ObDASScanResult *scan_result = static_cast<ObDASScanResult*>(task_result);
-  ColDescArray *col_desc = &(scan_ctdef_->table_param_.main_read_info_.cols_desc_);
+  const ObIArray<ObColDesc> *col_desc = &(scan_ctdef_->table_param_.get_read_info().get_columns_desc());
   if (OB_FAIL(scan_result->init_result_iter(&get_result_outputs(),
                                             &(scan_rtdef_->p_pd_expr_op_->get_eval_ctx()), col_desc, scan_ctdef_->use_row_cache_))) {
     LOG_WARN("init scan result iterator failed", K(ret));
@@ -746,7 +746,7 @@ int ObDASScanResult::get_next_row()
       SQL_ENG_LOG(WARN, "returned stored row is NULL", K(ret));
     } else if (output_exprs_->count() != sr->cnt_) {
       ret = OB_ERR_UNEXPECTED;
-      SQL_ENG_LOG(WARN, "stored row cell count mismatch", K(ret), K(sr->cnt_), K(exprs.count()));
+      SQL_ENG_LOG(WARN, "stored row cell count mismatch", K(ret), K(sr->cnt_));
     } else if (OB_FAIL(cache_fetcher_.put_row(sr, desc_))) {
       LOG_WARN("put row error", K(ret));
     } else if (OB_FAIL(result_iter_.convert_to_row(sr, *output_exprs_, *eval_ctx_))) {
@@ -805,7 +805,7 @@ void ObDASScanResult::reset()
   eval_ctx_ = nullptr;
 }
 
-int ObDASScanResult::init_result_iter(const ExprFixedArray *output_exprs, ObEvalCtx *eval_ctx, ColDescArray *descs, bool use_row_cache)
+int ObDASScanResult::init_result_iter(const ExprFixedArray *output_exprs, ObEvalCtx *eval_ctx, const ObIArray<ObColDesc> *descs, bool use_row_cache)
 {
   int ret = OB_SUCCESS;
   output_exprs_ = output_exprs;
@@ -827,7 +827,7 @@ int ObDASScanResult::init(const ObIDASTaskOp &op, common::ObIAllocator &alloc)
   const ObDASScanOp &scan_op = static_cast<const ObDASScanOp&>(op);
   uint64_t tenant_id = MTL_ID();
   need_check_output_datum_ = scan_op.need_check_output_datum();
-  tablet_id_ = scan_op.tablet_id_;
+  tablet_id_ = scan_op.get_tablet_id();
   if (OB_FAIL(datum_store_.init(UINT64_MAX,
                                tenant_id,
                                ObCtxIds::DEFAULT_CTX_ID,
