@@ -48,7 +48,7 @@ private:
 class ObDASCacheValue : public common::ObIKVCacheValue
 {
 public:
-  ObDASCacheValue();
+  ObDASCacheValue() = default;
   virtual ~ObDASCacheValue() = default;
   int init(const ObChunkDatumStore::StoredRow &row);
   virtual int64_t size() const override;
@@ -58,6 +58,10 @@ public:
 private:
   uint32_t col_cnt_;
   uint32_t row_size_;
+  // mark_datums_ is used to reduce memory copy, more specifically, it just
+  // save pointer to const ObChunkDatumStore temporarily.
+  // when deep copying, mark_datums_ is the source of data.
+  const ObDatum *mark_datums_;
   ObDatum *datums_;
 };
 

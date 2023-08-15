@@ -106,7 +106,7 @@ int ObDASCacheValue::init(const ObChunkDatumStore::StoredRow &row) {
 	// TODO: @kongye add more sanity check.
 	col_cnt_ = row.cnt_;
 	row_size_ = row.row_size_;
-	datums_ = row.cells();
+	mark_datums_ = row.cells();
 
 	return ret;
 }
@@ -128,11 +128,11 @@ int ObDASCacheValue::deep_copy(char *buf, const int64_t buf_len, ObIKVCacheValue
     } else {
       int64_t pos = 0;
       ObDASCacheValue *pcache_value = new (buf) ObDASCacheValue();
-      if (nullptr == datums_) {
+      if (nullptr == mark_datums_) {
           pcache_value->datums_ = nullptr;
       } else {
         char *tmp_buf = buf + sizeof(*this);
-        MEMCPY(tmp_buf, datums_, sizeof(ObDatum) * col_cnt_);
+        MEMCPY(tmp_buf, mark_datums_, sizeof(ObDatum) * col_cnt_);
         pcache_value->datums_ = reinterpret_cast<ObDatum *>(tmp_buf);
       }
       pcache_value->col_cnt_ = col_cnt_;
@@ -140,7 +140,7 @@ int ObDASCacheValue::deep_copy(char *buf, const int64_t buf_len, ObIKVCacheValue
 
       pos = sizeof(*this) + sizeof(ObDatum) * col_cnt_;
       for (int64_t i = 0; OB_SUCC(ret) && i < col_cnt_; ++i) {
-        if (OB_FAIL(pcache_value->datums_[i].deep_copy(datums_[i], buf, buf_len, pos))) {
+        if (OB_FAIL(pcache_value->datums_[i].deep_copy(mark_datums_[i], buf, buf_len, pos))) {
           LOG_WARN("Failed to deep copy datum", K(ret), K(i));
         }
       }
