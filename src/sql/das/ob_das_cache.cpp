@@ -157,8 +157,12 @@ int ObDASCacheValue::deep_copy(char *buf, const int64_t buf_len, ObIKVCacheValue
 
 
 ObDASCache &ObDASCache::get_instance() {
-  static ObDASCache instance_;
-  return instance_;
+  static ObDASCache instance;
+  static bool init = false;
+  if (!init) {
+    instance.init("das_row_cache");
+  }
+  return instance;
 }
 
 int ObDASCache::get_row(const ObDASCacheKey &key, ObDASCacheValueHandler &handle) {
