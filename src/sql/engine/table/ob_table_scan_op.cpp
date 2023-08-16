@@ -3233,7 +3233,10 @@ int ObGlobalIndexLookupOpImpl::init_group_range(int64_t cur_group_idx, int64_t g
 
 int ObGlobalIndexLookupOpImpl::do_index_lookup()
 {
+
   int ret = das_ref_.execute_all_task();
+
+  LOG_WARN("do index lookup");
 
   if (get_lookup_ctdef()->use_row_cache_) {
 	  LOG_DEBUG("use row cache can be passed on", K(get_lookup_ctdef()->use_row_cache_));
