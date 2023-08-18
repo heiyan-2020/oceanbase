@@ -325,6 +325,7 @@ void ObGlobalHint::reset()
   opt_params_.reset();
   ob_ddl_schema_versions_.reuse();
   enable_append_ = false;
+  use_row_cache_ = false;
   osg_hint_.flags_ = 0;
   has_dbms_stats_hint_ = false;
   flashback_read_tx_uncommitted_ = false;
@@ -353,6 +354,7 @@ int ObGlobalHint::merge_global_hint(const ObGlobalHint &other)
   disable_transform_ |= other.disable_transform_;
   disable_cost_based_transform_ |= other.disable_cost_based_transform_;
   enable_append_ |= other.enable_append_;
+  use_row_cache_ |= other.use_row_cache_;
   osg_hint_.flags_ |= other.osg_hint_.flags_;
   has_dbms_stats_hint_ |= other.has_dbms_stats_hint_;
   flashback_read_tx_uncommitted_ |= other.flashback_read_tx_uncommitted_;
