@@ -543,6 +543,9 @@ int ObGlobalHint::print_global_hint(PlanText &plan_text) const
   if (OB_SUCC(ret) && get_flashback_read_tx_uncommitted()) {
     PRINT_GLOBAL_HINT_STR("FLASHBACK_READ_TX_UNCOMMITTED");
   }
+  if (OB_SUCC(ret) && use_row_cache_) {
+    PRINT_GLOBAL_HINT_STR("USE DAS ROW CACHE");
+  }
   return ret;
 }
 
