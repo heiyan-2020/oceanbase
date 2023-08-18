@@ -12356,6 +12356,7 @@ int ObDMLResolver::resolve_global_hint(const ParseNode &hint_node,
 
   switch (hint_node.type_) {
     case T_ROW_CACHE: {
+      LOG_WARN("das cache trace 0", K(global_hint.use_row_cache_));
       global_hint.use_row_cache_ = true;
       break;
     }
