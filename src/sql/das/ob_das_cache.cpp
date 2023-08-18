@@ -160,7 +160,9 @@ ObDASCache &ObDASCache::get_instance() {
   static ObDASCache instance;
   static bool init = false;
   if (!init) {
+    // TODO: consider data race.
     instance.init("das_row_cache");
+    init = true;
   }
   return instance;
 }
