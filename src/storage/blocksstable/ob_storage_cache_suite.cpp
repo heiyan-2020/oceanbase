@@ -50,7 +50,6 @@ int ObStorageCacheSuite::init(
     const int64_t storage_meta_cache_priority)
 {
   int ret = OB_SUCCESS;
-  LOG_INFO("storage cache suite", K(index_block_cache_priority), K(user_block_cache_priority), K(user_row_cache_priority), K(fuse_row_cache_priority), K(bf_cache_priority));
   if (OB_UNLIKELY(is_inited_)) {
     ret = OB_INIT_TWICE;
     STORAGE_LOG(WARN, "The cache suite has been inited, ", K(ret));
