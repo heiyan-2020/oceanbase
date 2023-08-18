@@ -1060,6 +1060,7 @@ Timestamp{whitespace}?\"[^\"]*\" {
 <hint>REPLACE_CONST { return REPLACE_CONST; }
 <hint>NO_REPLACE_CONST { return NO_REPLACE_CONST; }
 <hint>ENABLE_PARALLEL_DML  { return ENABLE_PARALLEL_DML; }
+<hint>ROW_CACHE {return ROW_CACHE; }
 <hint>DISABLE_PARALLEL_DML  { return DISABLE_PARALLEL_DML; }
 <hint>INLINE { return INLINE; }
 <hint>MATERIALIZE { return MATERIALIZE; }
