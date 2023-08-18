@@ -178,6 +178,9 @@ int ObDASCache::put_row(const ObDASCacheKey &key, ObDASCacheValue &value) {
   } else if (OB_FAIL(put(key, value, true/*overwrite*/))) {
     LOG_WARN("fail to put row to das row cache", K(ret), K(key), K(value));
   }
+
+  uint64_t cache_cnt = count(key.get_tenant_id());
+  LOG_WARN("after put this row", K(cache_cnt), K(key), K(value));
   return ret;
 }
 

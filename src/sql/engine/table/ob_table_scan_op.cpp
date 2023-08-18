@@ -3239,7 +3239,7 @@ int ObGlobalIndexLookupOpImpl::do_index_lookup()
   LOG_WARN("do index lookup");
 
   if (get_lookup_ctdef()->use_row_cache_) {
-	  LOG_DEBUG("use row cache can be passed on", K(get_lookup_ctdef()->use_row_cache_));
+	  LOG_WARN("use row cache can be passed on", K(get_lookup_ctdef()->use_row_cache_));
   }
 
   if (OB_SUCC(ret)) {
