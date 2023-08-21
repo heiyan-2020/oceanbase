@@ -195,6 +195,16 @@ ObDASTaskFactory::~ObDASTaskFactory()
   cleanup();
 }
 
+int ObDASTaskFactory::create_das_cache_result(ObDASCacheResult *&result) {
+  int ret = OB_SUCCESS;
+  // TODO: where to free memory?
+  result = reinterpret_cast<ObDASCacheResult *>(allocator_.alloc(sizeof ObDASCacheResult));
+  if (OB_ISNULL(result)) {
+    ret = OB_ERR_UNEXPECTED;
+  }
+  return ret;
+}
+
 int ObDASTaskFactory::create_das_ctdef(ObDASOpType op_type, ObDASBaseCtDef *&ctdef)
 {
   int ret = OB_SUCCESS;

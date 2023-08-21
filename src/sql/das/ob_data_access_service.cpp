@@ -186,6 +186,8 @@ OB_NOINLINE int ObDataAccessService::execute_dist_das_task(
       }
     } else if (OB_FAIL(das_ref.acquire_task_execution_resource())) {
       LOG_WARN("failed to acquire execution resource", K(ret));
+    } else if (OB_FAIL()) {
+
     } else {
      if (async) {
         if (OB_FAIL(do_async_remote_das_task(das_ref, task_ops, task_arg))) {
@@ -537,6 +539,51 @@ int ObDataAccessService::do_sync_remote_das_task(
     }
   }
   das_ref.inc_concurrency_limit();
+  return ret;
+}
+
+int ObDataAccessService::remove_if_cache_hit(ObDASRef &das_ref, ObDASTaskArg &task_arg) {
+  int ret = OB_SUCCESS;
+  common::ObSEArray<ObIDASTaskOp*, 2> &task_ops = task_arg.get_task_ops();
+  common::ObSEArray<uint32_t, 2> removed_taskop_idx;
+  for(uint32_t i = 0; OB_SUCC(ret) && i < task_ops.count(); i++) {
+    if (task_ops.at(i)->get_type() != DAS_OP_TABLE_SCAN) {
+      continue;
+    } else {
+      ObDASScanOp *scan_op = static_cast<ObDASScanOp *>(task_ops.at(i));
+      ObIArray<ObNewRange> &scan_ranges = scan_op->get_scan_param().key_ranges_;
+      cache_fetcher_.init(scan_op->scan_param_.tablet_id_);
+      ObDASCacheValueHandle handle;
+      ObDASCacheResult *iter_ptr = nullptr;
+      if (!scan_op->scan_ctdef_->use_row_cache_) {
+        continue;
+      } else if (scan_ranges.count() != 1) {
+        ret = OB_ERR_UNEXPECTED;
+        LOG_WARN("das cache error: use row cache but multiple ranges", K(ret));
+      } else if (scan_ranges.at(0).start_key_ != scan_ranges.at(0).end_key_) {
+        ret = OB_ERR_UNEXPECTED;
+        LOG_WARN("das cache error: use row cache but not point select", K(ret));
+      } else if (OB_FAIL(cache_fetcher_.get_row(scan_ranges.at(0).start_key_, handle))) {
+        if (ret == OB_ENTRY_NOT_EXIST) {
+          ret = OB_SUCCESS;
+        }
+      } else if (OB_FAIL(das_ref.get_das_factory().create_das_cache_result(iter_ptr))){
+        LOG_WARN("create das cache result failed, allocation failed");
+      } else {
+        iter_ptr->init(&scan_op->get_result_outputs(), &(scan_op->scan_rtdef_->p_pd_expr_op_->get_eval_ctx()), handle);
+        scan_op->result_ = iter_ptr;
+
+        removed_taskop_idx.push_back(i);
+      }
+    }
+  }
+
+  if (OB_SUCC(ret)) {
+    for (uint32_t i = 0; i < removed_taskop_idx.count(); i++) {
+      task_ops.remove(i);
+    }
+  }
+
   return ret;
 }
 

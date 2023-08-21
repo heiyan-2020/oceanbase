@@ -167,7 +167,7 @@ ObDASCache &ObDASCache::get_instance() {
   return instance;
 }
 
-int ObDASCache::get_row(const ObDASCacheKey &key, ObDASCacheValueHandler &handle) {
+int ObDASCache::get_row(const ObDASCacheKey &key, ObDASCacheValueHandle &handle) {
   int ret = OB_SUCCESS;
   return ret;
 }
@@ -192,7 +192,7 @@ int ObDASCacheFetcher::init(ObTabletID &tablet_id) {
   return ret;
 }
 
-int ObDASCacheFetcher::get_row(const ObRowkey &key, ObDASCacheValueHandler &handle) {
+int ObDASCacheFetcher::get_row(const ObRowkey &key, ObDASCacheValueHandle &handle) {
   int ret = OB_SUCCESS;
   return ret;
 }
@@ -236,6 +236,51 @@ int ObDASCacheFetcher::extract_key(const ObChunkDatumStore::StoredRow *row, cons
   return ret;
 }
 
+
+int ObDASCacheResult::init(const ExprFixedArray *output_exprs, ObEvalCtx *eval_ctx, ObDASCacheValueHandle &handle) {
+  int ret = OB_SUCCESS;
+  output_exprs_ = output_exprs;
+  eval_ctx_ = eval_ctx;
+  handle_ = handle;
+  return ret;
+}
+
+int ObDASCacheResult::get_next_row() {
+  int ret = OB_SUCCESS;
+  if (OB_ISNULL(handle_)) {
+    ret = OB_ERR_UNEXPECTED;
+    LOG_WARN("das cache warn: handle is null", K(ret));
+  } else {
+    ObDASCacheValue *value = handle_.value_;
+    if (OB_UNLIKELY(value->col_cnt_ != output_exprs_->count())) {
+      ret = OB_ERR_UNEXPECTED;
+      LOG_WARN("das cache warn: cache value is unmatched with expr", K(ret));
+    } else {
+      for (uint32_t i = 0; i < value->col_cnt_; i++) {
+        ObExpr *expr = output_exprs_->at(i);
+        if (expr->is_const_expr()) {
+          continue;
+        } else {
+          const ObDatum &src = value->datums_[i];
+          ObDatum &dst = expr->locate_expr_datum(*eval_ctx_);
+          dst = src;
+          expr->set_evaluated_projected(*eval_ctx_);
+        }
+      }
+    }
+  }
+
+  return ret;
+}
+
+void ObDASCacheResult::reset() {
+  // TODO: when does this function be called?
+  output_exprs_ = nullptr;
+  eval_ctx_ = nullptr;
+  handle_.handle_.reset();
+  int ret = OB_SUCCESS;
+  LOG_WARN("reset has been called");
+}
 
 
 } // namespace sql

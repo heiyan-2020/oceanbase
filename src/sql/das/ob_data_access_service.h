@@ -64,12 +64,14 @@ private:
   int do_sync_remote_das_task(ObDASRef &das_ref, ObDasAggregatedTasks &aggregated_tasks, ObDASTaskArg &task_arg);
   int collect_das_task_info(ObDASTaskArg &task_arg, ObDASRemoteInfo &remote_info);
   void calc_das_task_parallelism(const ObDASRef &das_ref, const ObDasAggregatedTasks &task_ops, int &target_parallelism);
+  int remove_if_cache_hit(ObDASRef &das_ref, ObDASTaskArg &task_arg);
 private:
   obrpc::ObDASRpcProxy das_rpc_proxy_;
   common::ObAddr ctrl_addr_;
   ObDASIDCache id_cache_;
   ObDASTaskResultMgr task_result_mgr_;
   int32_t das_concurrency_limit_;
+  ObDASCacheFetcher cache_fetcher_;
 };
 }  // namespace sql
 }  // namespace oceanbase

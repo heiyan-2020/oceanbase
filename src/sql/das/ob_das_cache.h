@@ -65,10 +65,10 @@ private:
   ObDatum *datums_;
 };
 
-struct ObDASCacheValueHandler
+struct ObDASCacheValueHandle
 {
-	ObDASCacheValueHandler() : value_(nullptr), handle_() {}
-	~ObDASCacheValueHandler() = default;
+	ObDASCacheValueHandle() : value_(nullptr), handle_() {}
+	~ObDASCacheValueHandle() = default;
 	ObDASCacheValue *value_;
 	ObKVCacheHandle handle_;
 };
@@ -80,7 +80,7 @@ public:
   ObDASCache() = default;
   virtual ~ObDASCache() = default;
   static ObDASCache &get_instance();
-  int get_row(const ObDASCacheKey &key, ObDASCacheValueHandler &handle);
+  int get_row(const ObDASCacheKey &key, ObDASCacheValueHandle &handle);
   int put_row(const ObDASCacheKey &key, ObDASCacheValue &value);
 
   ObArenaAllocator rowkey_allocator_;
@@ -94,7 +94,7 @@ public:
   ObDASCacheFetcher() = default;
   ~ObDASCacheFetcher() = default;
   int init(ObTabletID &tablet_id);
-  int get_row(const ObRowkey &key, ObDASCacheValueHandler &handle);
+  int get_row(const ObRowkey &key, ObDASCacheValueHandle &handler);
   int put_row(const ObChunkDatumStore::StoredRow *row, const ObIArray<ObColDesc> *desc);
 
 private:
@@ -104,6 +104,21 @@ private:
   int extract_key(const ObChunkDatumStore::StoredRow *row, const ObIArray<ObColDesc> *desc, ObRowkey &key);
 private:
   ObTabletID tablet_id_;
+};
+
+
+class ObDASCacheResult : public common::ObNewRowIterator {
+public:
+  ObDASCacheResult() : output_exprs_(nullptr), eval_ctx_(nullptr) {}
+  int init(const ExprFixedArray *output_exprs, ObEvalCtx *eval_ctx, ObDASCacheValueHandle &handle);
+  virtual ~ObDASCacheResult() = default;
+  virtual int get_next_row() override;
+  virtual void reset() override;
+
+private:
+  const ExprFixedArray *output_exprs_;
+  ObEvalCtx *eval_ctx_;
+  ObDASCacheValueHandle handle_;
 };
 
 }  // namespace sql
