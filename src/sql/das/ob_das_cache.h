@@ -54,6 +54,8 @@ public:
   virtual int64_t size() const override;
   bool is_valid() const { return (nullptr != datums_ && 0 != col_cnt_) || (nullptr == datums_ && 0 == col_cnt_); }
   virtual int deep_copy(char *buf, const int64_t buf_len, ObIKVCacheValue *&value) const override;
+  uint32_t get_col_count() const { return col_cnt_; }
+  ObDatum *get_datums() const { return datums_; }
   TO_STRING_KV(KP_(datums), K_(col_cnt), K_(row_size));
 private:
   uint32_t col_cnt_;

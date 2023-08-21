@@ -14,6 +14,7 @@
 #define OBDEV_SRC_SQL_DAS_OB_DAS_FACTORY_H_
 #include "lib/list/ob_obj_store.h"
 #include "sql/das/ob_das_task.h"
+#include "sql/das/ob_das_cache.h"
 namespace oceanbase
 {
 namespace sql

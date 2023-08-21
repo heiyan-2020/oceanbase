@@ -247,25 +247,20 @@ int ObDASCacheResult::init(const ExprFixedArray *output_exprs, ObEvalCtx *eval_c
 
 int ObDASCacheResult::get_next_row() {
   int ret = OB_SUCCESS;
-  if (OB_ISNULL(handle_)) {
+  ObDASCacheValue *value = handle_.value_;
+  if (OB_UNLIKELY(value->get_col_count() != output_exprs_->count())) {
     ret = OB_ERR_UNEXPECTED;
-    LOG_WARN("das cache warn: handle is null", K(ret));
+    LOG_WARN("das cache warn: cache value is unmatched with expr", K(ret));
   } else {
-    ObDASCacheValue *value = handle_.value_;
-    if (OB_UNLIKELY(value->col_cnt_ != output_exprs_->count())) {
-      ret = OB_ERR_UNEXPECTED;
-      LOG_WARN("das cache warn: cache value is unmatched with expr", K(ret));
-    } else {
-      for (uint32_t i = 0; i < value->col_cnt_; i++) {
-        ObExpr *expr = output_exprs_->at(i);
-        if (expr->is_const_expr()) {
-          continue;
-        } else {
-          const ObDatum &src = value->datums_[i];
-          ObDatum &dst = expr->locate_expr_datum(*eval_ctx_);
-          dst = src;
-          expr->set_evaluated_projected(*eval_ctx_);
-        }
+    for (uint32_t i = 0; i < value->get_col_count(); i++) {
+      ObExpr *expr = output_exprs_->at(i);
+      if (expr->is_const_expr()) {
+        continue;
+      } else {
+        const ObDatum &src = value->get_datums()[i];
+        ObDatum &dst = expr->locate_expr_datum(*eval_ctx_);
+        dst = src;
+        expr->set_evaluated_projected(*eval_ctx_);
       }
     }
   }
