@@ -198,7 +198,7 @@ ObDASTaskFactory::~ObDASTaskFactory()
 int ObDASTaskFactory::create_das_cache_result(ObDASCacheResult *&result) {
   int ret = OB_SUCCESS;
   // TODO: where to free memory?
-  result = reinterpret_cast<ObDASCacheResult *>(allocator_.alloc(sizeof ObDASCacheResult));
+  result = reinterpret_cast<ObDASCacheResult *>(allocator_.alloc(sizeof(ObDASCacheResult)));
   if (OB_ISNULL(result)) {
     ret = OB_ERR_UNEXPECTED;
   }

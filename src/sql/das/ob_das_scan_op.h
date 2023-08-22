@@ -23,6 +23,7 @@ namespace sql
 {
 class ObDASExtraData;
 class ObLocalIndexLookupOp;
+class ObDataAccessService;
 
 struct ObDASScanCtDef : ObDASBaseCtDef
 {
@@ -169,6 +170,7 @@ private:
 class ObDASScanOp : public ObIDASTaskOp
 {
   friend class DASOpResultIter;
+  friend class ObDataAccessService;
   OB_UNIS_VERSION(1);
 public:
   ObDASScanOp(common::ObIAllocator &op_alloc);

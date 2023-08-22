@@ -186,8 +186,8 @@ OB_NOINLINE int ObDataAccessService::execute_dist_das_task(
       }
     } else if (OB_FAIL(das_ref.acquire_task_execution_resource())) {
       LOG_WARN("failed to acquire execution resource", K(ret));
-    } else if (OB_FAIL()) {
-
+    } else if (OB_FAIL(remove_if_cache_hit(das_ref, task_arg))) {
+      LOG_WARN("failed to check cache", K(ret));
     } else {
      if (async) {
         if (OB_FAIL(do_async_remote_das_task(das_ref, task_ops, task_arg))) {
@@ -552,7 +552,7 @@ int ObDataAccessService::remove_if_cache_hit(ObDASRef &das_ref, ObDASTaskArg &ta
     } else {
       ObDASScanOp *scan_op = static_cast<ObDASScanOp *>(task_ops.at(i));
       ObIArray<ObNewRange> &scan_ranges = scan_op->get_scan_param().key_ranges_;
-      cache_fetcher_.init(scan_op->scan_param_.tablet_id_);
+      cache_fetcher_.init(scan_op->get_scan_param().tablet_id_);
       ObDASCacheValueHandle handle;
       ObDASCacheResult *iter_ptr = nullptr;
       if (!scan_op->scan_ctdef_->use_row_cache_) {
