@@ -26,9 +26,9 @@ namespace sql
 class ObDASCacheKey : public common::ObIKVCacheKey
 {
 public:
-  ObDASCacheKey() = default;
+  ObDASCacheKey() : rowkey_size_(0), tenant_id_(0) {}
   virtual ~ObDASCacheKey() = default;
-  int init(uint64_t tenant_id, ObTabletID &tablet_id, ObRowkey &rowkey);
+  int init(uint64_t tenant_id, ObTabletID &tablet_id, const ObRowkey &rowkey);
   virtual int equal(const ObIKVCacheKey &other, bool &equal) const override;
   virtual int hash(uint64_t &hash_value) const override;
   virtual uint64_t get_tenant_id() const override;
@@ -93,7 +93,7 @@ private:
 
 class ObDASCacheFetcher {
 public:
-  ObDASCacheFetcher() = default;
+  ObDASCacheFetcher() : is_inited_(false) {}
   ~ObDASCacheFetcher() = default;
   int init(ObTabletID &tablet_id);
   int get_row(const ObRowkey &key, ObDASCacheValueHandle &handler);
@@ -106,6 +106,7 @@ private:
   int extract_key(const ObChunkDatumStore::StoredRow *row, const ObIArray<ObColDesc> *desc, ObRowkey &key);
 private:
   ObTabletID tablet_id_;
+  bool is_inited_;
 };
 
 

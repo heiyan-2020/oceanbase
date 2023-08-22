@@ -20,13 +20,12 @@ namespace sql
 {
 
 
-int ObDASCacheKey::init(uint64_t tenant_id, ObTabletID &tablet_id, ObRowkey &rowkey) {
+int ObDASCacheKey::init(uint64_t tenant_id, ObTabletID &tablet_id, const ObRowkey &rowkey) {
   int ret = OB_SUCCESS;
   tenant_id_ = tenant_id;
   tablet_id_ = tablet_id;
   rowkey_ = rowkey;
   rowkey_size_ = rowkey_.get_deep_copy_size();
-
   return ret;
 }
 
@@ -169,6 +168,22 @@ ObDASCache &ObDASCache::get_instance() {
 
 int ObDASCache::get_row(const ObDASCacheKey &key, ObDASCacheValueHandle &handle) {
   int ret = OB_SUCCESS;
+  const ObDASCacheValue *value = nullptr;
+  if (OB_UNLIKELY(!key.is_valid())) {
+    ret = OB_INVALID_ARGUMENT;
+    LOG_WARN("invalid arguments", K(ret), K(key));
+  } else if (OB_FAIL(get(key, value, handle.handle_))) {
+    if (OB_UNLIKELY(OB_ENTRY_NOT_EXIST != ret)) {
+      LOG_WARN("fail to get key from row cache", K(ret));
+    }
+  } else {
+    if (OB_ISNULL(value)) {
+      ret = OB_ERR_UNEXPECTED;
+      LOG_WARN("unexpected error, the value must not be NULL", K(ret));
+    } else {
+      handle.value_ = const_cast<ObDASCacheValue *>(value);
+    }
+  }
   return ret;
 }
 
@@ -188,12 +203,27 @@ int ObDASCache::put_row(const ObDASCacheKey &key, ObDASCacheValue &value) {
 
 int ObDASCacheFetcher::init(ObTabletID &tablet_id) {
   tablet_id_ = tablet_id;
+  is_inited_ = true;
   int ret = OB_SUCCESS;
   return ret;
 }
 
 int ObDASCacheFetcher::get_row(const ObRowkey &key, ObDASCacheValueHandle &handle) {
   int ret = OB_SUCCESS;
+
+  if (OB_UNLIKELY(!is_inited_)) {
+    ret = OB_NOT_INIT;
+    LOG_WARN("ObDASCacheFetcher has not been inited", K(ret));
+  } else {
+    ObDASCacheKey cache_key;
+    cache_key.init(MTL_ID(), tablet_id_, key);
+    if (OB_FAIL(ObDASCache::get_instance().get_row(cache_key, handle))) {
+      if (OB_ENTRY_NOT_EXIST != ret) {
+        STORAGE_LOG(WARN, "fail to get row from das row cache", K(ret), K(cache_key));
+      }
+    }
+  }
+
   return ret;
 }
 
