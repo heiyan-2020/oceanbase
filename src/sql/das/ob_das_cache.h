@@ -26,7 +26,7 @@ namespace sql
 class ObDASCacheKey : public common::ObIKVCacheKey
 {
 public:
-  ObDASCacheKey() : rowkey_size_(0), tenant_id_(0) {}
+  ObDASCacheKey() : tenant_id_(0), rowkey_size_(0) {}
   virtual ~ObDASCacheKey() = default;
   int init(uint64_t tenant_id, ObTabletID &tablet_id, const ObRowkey &rowkey);
   virtual int equal(const ObIKVCacheKey &other, bool &equal) const override;
