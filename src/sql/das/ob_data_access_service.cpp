@@ -561,7 +561,7 @@ int ObDataAccessService::remove_if_cache_hit(ObDASRef &das_ref, ObDASTaskArg &ta
         continue;
       } else if (scan_ranges.count() != 1) {
         ret = OB_ERR_UNEXPECTED;
-        LOG_WARN("das cache error: use row cache but multiple ranges", K(ret));
+        LOG_WARN("das cache error: use row cache but multiple ranges", K(ret), K(scan_ranges.count()), K(scan_ranges));
       } else if (scan_ranges.at(0).start_key_ != scan_ranges.at(0).end_key_) {
         ret = OB_ERR_UNEXPECTED;
         LOG_WARN("das cache error: use row cache but not point select", K(ret));
