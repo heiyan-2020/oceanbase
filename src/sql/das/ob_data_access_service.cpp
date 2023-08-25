@@ -546,11 +546,13 @@ int ObDataAccessService::remove_if_cache_hit(ObDASRef &das_ref, ObDASTaskArg &ta
   int ret = OB_SUCCESS;
   common::ObSEArray<ObIDASTaskOp*, 2> &task_ops = task_arg.get_task_ops();
   common::ObSEArray<uint32_t, 2> removed_taskop_idx;
+  LOG_WARN("read cache trace 1: enter cache hit function");
   for(uint32_t i = 0; OB_SUCC(ret) && i < task_ops.count(); i++) {
     if (task_ops.at(i)->get_type() != DAS_OP_TABLE_SCAN) {
       continue;
     } else {
       ObDASScanOp *scan_op = static_cast<ObDASScanOp *>(task_ops.at(i));
+      LOG_WARN("read cache trace 2: remote das scan", K(scan_op->scan_ctdef_->use_row_cache_));
       ObIArray<ObNewRange> &scan_ranges = scan_op->get_scan_param().key_ranges_;
       cache_fetcher_.init(scan_op->get_scan_param().tablet_id_);
       ObDASCacheValueHandle handle;

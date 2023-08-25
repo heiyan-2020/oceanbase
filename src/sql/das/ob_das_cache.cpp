@@ -211,6 +211,8 @@ int ObDASCacheFetcher::init(ObTabletID &tablet_id) {
 int ObDASCacheFetcher::get_row(const ObRowkey &key, ObDASCacheValueHandle &handle) {
   int ret = OB_SUCCESS;
 
+  LOG_WARN("read cache trace 3: get row", K(key));
+
   if (OB_UNLIKELY(!is_inited_)) {
     ret = OB_NOT_INIT;
     LOG_WARN("ObDASCacheFetcher has not been inited", K(ret));
