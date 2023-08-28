@@ -95,7 +95,7 @@ class ObDASCacheFetcher {
 public:
   ObDASCacheFetcher() : is_inited_(false) {}
   ~ObDASCacheFetcher() = default;
-  int init(ObTabletID &tablet_id);
+  int init(const ObTabletID &tablet_id);
   int get_row(const ObRowkey &key, ObDASCacheValueHandle &handler);
   int put_row(const ObChunkDatumStore::StoredRow *row, const ObIArray<ObColDesc> *desc);
 

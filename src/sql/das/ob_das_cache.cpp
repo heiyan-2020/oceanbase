@@ -202,7 +202,7 @@ int ObDASCache::put_row(const ObDASCacheKey &key, ObDASCacheValue &value) {
   return ret;
 }
 
-int ObDASCacheFetcher::init(ObTabletID &tablet_id) {
+int ObDASCacheFetcher::init(const ObTabletID &tablet_id) {
   tablet_id_ = tablet_id;
   is_inited_ = true;
   int ret = OB_SUCCESS;
