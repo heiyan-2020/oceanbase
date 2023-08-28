@@ -202,6 +202,7 @@ int ObDASTaskFactory::create_das_cache_result(ObDASCacheResult *&result) {
   if (OB_ISNULL(result)) {
     ret = OB_ERR_UNEXPECTED;
   }
+  LOG_WARN("read cache trace 5: after allocation", K(ret));
   return ret;
 }
 
