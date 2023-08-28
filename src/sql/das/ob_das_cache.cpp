@@ -283,7 +283,8 @@ int ObDASCacheResult::init(const ExprFixedArray *output_exprs, ObEvalCtx *eval_c
   int ret = OB_SUCCESS;
   output_exprs_ = output_exprs;
   eval_ctx_ = eval_ctx;
-  handle_ = handle;
+  handle_.handle_ = handle.handle_;
+  handle_.value_ = handle.value_;
   return ret;
 }
 
