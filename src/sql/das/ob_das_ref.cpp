@@ -232,7 +232,7 @@ bool ObDASRef::is_all_local_task() const
 int ObDASRef::execute_all_task()
 {
   int ret = OB_SUCCESS;
-  const bool async = GET_MIN_CLUSTER_VERSION() >= CLUSTER_VERSION_4_1_0_0;
+  const bool async = false;
   // move local aggregated tasks to last for better concurrency.
   if (OB_FAIL(move_local_tasks_to_last())) {
     LOG_WARN("failed to move local tasks to last.", K(ret));
