@@ -2156,11 +2156,6 @@ int ObTableScanOp::cherry_pick_range_by_tablet_id(ObDASScanOp *scan_op)
   bool add_all = false;
   bool prune_all = true;
 
-  if (scan_op->scan_ctdef_->use_row_cache_) {
-    LOG_WARN("read cache trace 0: cherry pick ranges", K(input_ranges.count()),
-                                                                 K(input_ss_ranges.count()));
-  }
-
   if (!MY_SPEC.is_vt_mapping_ && OB_UNLIKELY(input_ranges.count() != input_ss_ranges.count())) {
     ret = OB_ERR_UNEXPECTED;
     LOG_WARN("ranges and skip scan postfix ranges mismatch", K(ret), K(input_ranges.count()),
