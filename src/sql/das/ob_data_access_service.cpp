@@ -188,7 +188,7 @@ OB_NOINLINE int ObDataAccessService::execute_dist_das_task(
       LOG_WARN("failed to acquire execution resource", K(ret));
     } else if (OB_FAIL(remove_if_cache_hit(das_ref, task_arg))) {
       LOG_WARN("failed to check cache", K(ret));
-    } else {
+    } else if (task_arg.get_task_ops().count() > 0) {
      if (async) {
         if (OB_FAIL(do_async_remote_das_task(das_ref, task_ops, task_arg))) {
           das_ref.inc_concurrency_limit();
