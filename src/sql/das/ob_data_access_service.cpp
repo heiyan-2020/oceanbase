@@ -583,6 +583,7 @@ int ObDataAccessService::remove_if_cache_hit(ObDASRef &das_ref, ObDASTaskArg &ta
   if (OB_SUCC(ret)) {
     for (uint32_t i = 0; i < removed_taskop_idx.count(); i++) {
       task_ops.remove(i);
+      das_ref.inc_concurrency_limit();
     }
   }
 
