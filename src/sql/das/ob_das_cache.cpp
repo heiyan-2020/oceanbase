@@ -95,6 +95,7 @@ int ObDASCacheKey::deep_copy(char *buf, const int64_t buf_len, ObIKVCacheKey *&k
 }
 
 bool ObDASCacheKey::is_valid() const {
+  int ret = OB_SUCCESS;
   LOG_WARN("cache key validation", K(tenant_id_), K(tablet_id_), K(rowkey_size_));
   return OB_LIKELY(tenant_id_ != 0 && tablet_id_.is_valid() && rowkey_size_ > 0);
 }
