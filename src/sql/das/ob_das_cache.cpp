@@ -95,8 +95,6 @@ int ObDASCacheKey::deep_copy(char *buf, const int64_t buf_len, ObIKVCacheKey *&k
 }
 
 bool ObDASCacheKey::is_valid() const {
-  int ret = OB_SUCCESS;
-  LOG_WARN("cache key validation", K(tenant_id_), K(tablet_id_), K(rowkey_size_));
   return OB_LIKELY(tenant_id_ != 0 && tablet_id_.is_valid() && rowkey_size_ > 0);
 }
 
@@ -186,6 +184,9 @@ int ObDASCache::get_row(const ObDASCacheKey &key, ObDASCacheValueHandle &handle)
       handle.value_ = const_cast<ObDASCacheValue *>(value);
     }
   }
+
+  LOG_WARN("read cache trace 4: after getting row");
+
   return ret;
 }
 
@@ -281,6 +282,7 @@ int ObDASCacheResult::init(const ExprFixedArray *output_exprs, ObEvalCtx *eval_c
 
 int ObDASCacheResult::get_next_row() {
   int ret = OB_SUCCESS;
+  LOG_WARN("read cache trace 5: get next row");
   ObDASCacheValue *value = handle_.value_;
   if (OB_UNLIKELY(value->get_col_count() != output_exprs_->count())) {
     ret = OB_ERR_UNEXPECTED;
