@@ -116,42 +116,49 @@ int64_t ObDASCacheValue::size() const
 }
 
 int ObDASCacheValue::deep_copy(char *buf, const int64_t buf_len, ObIKVCacheValue *&value) const {
-	int ret = OB_SUCCESS;
+  int ret = OB_SUCCESS;
 
-    if (OB_UNLIKELY(nullptr == buf || buf_len < size())) {
-      ret = OB_INVALID_ARGUMENT;
-      LOG_WARN("invalid arguments", K(ret), KP(buf), K(buf_len), "request_size", size());
-    } else if (OB_UNLIKELY(!is_valid())) {
-      ret = OB_INVALID_DATA;
-      LOG_WARN("invalid row cache value", K(ret));
+  if (OB_UNLIKELY(nullptr == buf || buf_len < size())) {
+    ret = OB_INVALID_ARGUMENT;
+    LOG_WARN("invalid arguments", K(ret), KP(buf), K(buf_len), "request_size", size());
+  } else if (OB_UNLIKELY(!is_valid())) {
+    ret = OB_INVALID_DATA;
+    LOG_WARN("invalid row cache value", K(ret));
+  } else {
+    int64_t pos = 0;
+    ObDASCacheValue *pcache_value = new (buf) ObDASCacheValue();
+    const ObDatum *src = nullptr;
+    if (nullptr == mark_datums_) {
+      src = datums_;
     } else {
-      int64_t pos = 0;
-      ObDASCacheValue *pcache_value = new (buf) ObDASCacheValue();
-      if (nullptr == mark_datums_) {
-          pcache_value->datums_ = nullptr;
-      } else {
-        char *tmp_buf = buf + sizeof(*this);
-        MEMCPY(tmp_buf, mark_datums_, sizeof(ObDatum) * col_cnt_);
-        pcache_value->datums_ = reinterpret_cast<ObDatum *>(tmp_buf);
-      }
+      src = mark_datums_;
+    }
+
+    if (src == nullptr) {
+      ret = OB_INVALID_DATA;
+    } else {
+      char *tmp_buf = buf + sizeof(*this);
+      MEMCPY(tmp_buf, src, sizeof(ObDatum) * col_cnt_);
+      pcache_value->datums_ = reinterpret_cast<ObDatum *>(tmp_buf);
       pcache_value->col_cnt_ = col_cnt_;
       pcache_value->row_size_ = row_size_;
 
       pos = sizeof(*this) + sizeof(ObDatum) * col_cnt_;
       for (int64_t i = 0; OB_SUCC(ret) && i < col_cnt_; ++i) {
-        if (OB_FAIL(pcache_value->datums_[i].deep_copy(mark_datums_[i], buf, buf_len, pos))) {
+        if (OB_FAIL(pcache_value->datums_[i].deep_copy(src[i], buf, buf_len, pos))) {
           LOG_WARN("Failed to deep copy datum", K(ret), K(i));
         }
       }
-
-      if (OB_SUCC(ret)) {
-        value = pcache_value;
-      } else if (nullptr != pcache_value) {
-          pcache_value->~ObDASCacheValue();
-          pcache_value = nullptr;
-      }
     }
-    return ret;
+
+    if (OB_SUCC(ret)) {
+      value = pcache_value;
+    } else if (nullptr != pcache_value) {
+        pcache_value->~ObDASCacheValue();
+        pcache_value = nullptr;
+    }
+  }
+  return ret;
 }
 
 
