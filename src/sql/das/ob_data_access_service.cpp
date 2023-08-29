@@ -582,6 +582,7 @@ int ObDataAccessService::remove_if_cache_hit(ObDASRef &das_ref, ObDasAggregatedT
 
   if (OB_SUCC(ret)) {
     for (uint32_t i = 0; i < removed_taskop_idx.count(); i++) {
+      task_ops.at(i)->set_task_status(ObDasTaskStatus::FINISHED);
       agg_ops.move_to_success_tasks(task_ops.at(i));
       task_ops.remove(i);
       das_ref.inc_concurrency_limit();
