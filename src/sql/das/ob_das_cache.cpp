@@ -182,6 +182,8 @@ int ObDASCache::get_row(const ObDASCacheKey &key, ObDASCacheValueHandle &handle)
   } else if (OB_FAIL(get(key, value, handle.handle_))) {
     if (OB_UNLIKELY(OB_ENTRY_NOT_EXIST != ret)) {
       LOG_WARN("fail to get key from row cache", K(ret));
+    } else {
+      LOG_WARN("das cache: miss");
     }
   } else {
     if (OB_ISNULL(value)) {
@@ -189,10 +191,9 @@ int ObDASCache::get_row(const ObDASCacheKey &key, ObDASCacheValueHandle &handle)
       LOG_WARN("unexpected error, the value must not be NULL", K(ret));
     } else {
       handle.value_ = const_cast<ObDASCacheValue *>(value);
+      LOG_WARN("das cache: hit");
     }
   }
-
-  LOG_WARN("read cache trace 4: after getting row");
 
   return ret;
 }
@@ -207,7 +208,7 @@ int ObDASCache::put_row(const ObDASCacheKey &key, ObDASCacheValue &value) {
   }
 
   uint64_t cache_cnt = count(key.get_tenant_id());
-  LOG_WARN("after put this row", K(cache_cnt), K(key), K(value));
+  LOG_WARN("das cache: put", K(cache_cnt), K(key), K(value));
   return ret;
 }
 
@@ -220,8 +221,6 @@ int ObDASCacheFetcher::init(const ObTabletID &tablet_id) {
 
 int ObDASCacheFetcher::get_row(const ObRowkey &key, ObDASCacheValueHandle &handle) {
   int ret = OB_SUCCESS;
-
-  LOG_WARN("read cache trace 3: get row", K(key));
 
   if (OB_UNLIKELY(!is_inited_)) {
     ret = OB_NOT_INIT;
@@ -290,7 +289,7 @@ int ObDASCacheResult::init(const ExprFixedArray *output_exprs, ObEvalCtx *eval_c
 
 int ObDASCacheResult::get_next_row() {
   int ret = OB_SUCCESS;
-  LOG_WARN("read cache trace 5: get next row");
+
   ObDASCacheValue *value = handle_.value_;
   if (OB_UNLIKELY(value->get_col_count() != output_exprs_->count())) {
     ret = OB_ERR_UNEXPECTED;

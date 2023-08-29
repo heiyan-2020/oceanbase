@@ -204,7 +204,7 @@ int ObDASTaskFactory::create_das_cache_result(ObDASCacheResult *&result) {
   } else {
     result = new (buf) ObDASCacheResult();
   }
-  LOG_WARN("read cache trace 5: after allocation", K(ret));
+
   return ret;
 }
 
