@@ -116,6 +116,7 @@ public:
   int init(const ExprFixedArray *output_exprs, ObEvalCtx *eval_ctx, ObDASCacheValueHandle &handle);
   virtual ~ObDASCacheResult() = default;
   virtual int get_next_row() override;
+  virtual int get_next_row(ObNewRow *&row) override;
   virtual void reset() override;
 
 private:

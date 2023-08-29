@@ -312,6 +312,13 @@ int ObDASCacheResult::get_next_row() {
   return ret;
 }
 
+int ObDASCacheResult::get_next_row(ObNewRow *&row)
+{
+  UNUSED(row);
+  return OB_NOT_IMPLEMENT;
+}
+
+
 void ObDASCacheResult::reset() {
   // TODO: when does this function be called?
   output_exprs_ = nullptr;
