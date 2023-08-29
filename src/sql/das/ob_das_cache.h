@@ -112,7 +112,7 @@ private:
 
 class ObDASCacheResult : public common::ObNewRowIterator {
 public:
-  ObDASCacheResult() : output_exprs_(nullptr), eval_ctx_(nullptr) {}
+  ObDASCacheResult() : fetched_(false), output_exprs_(nullptr), eval_ctx_(nullptr) {}
   int init(const ExprFixedArray *output_exprs, ObEvalCtx *eval_ctx, ObDASCacheValueHandle &handle);
   virtual ~ObDASCacheResult() = default;
   virtual int get_next_row() override;
@@ -120,6 +120,7 @@ public:
   virtual void reset() override;
 
 private:
+  bool fetched_; // record whether this row has been iterated.
   const ExprFixedArray *output_exprs_;
   ObEvalCtx *eval_ctx_;
   ObDASCacheValueHandle handle_;

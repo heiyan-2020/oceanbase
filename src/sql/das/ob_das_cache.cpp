@@ -295,7 +295,7 @@ int ObDASCacheResult::get_next_row() {
   if (OB_UNLIKELY(value->get_col_count() != output_exprs_->count())) {
     ret = OB_ERR_UNEXPECTED;
     LOG_WARN("das cache warn: cache value is unmatched with expr", K(ret));
-  } else {
+  } else if (!fetched_) {
     for (uint32_t i = 0; i < value->get_col_count(); i++) {
       ObExpr *expr = output_exprs_->at(i);
       if (expr->is_const_expr()) {
@@ -307,6 +307,10 @@ int ObDASCacheResult::get_next_row() {
         expr->set_evaluated_projected(*eval_ctx_);
       }
     }
+
+    fetched_ = true;
+  } else {
+    ret = OB_ITER_END;
   }
 
   return ret;
@@ -321,6 +325,7 @@ int ObDASCacheResult::get_next_row(ObNewRow *&row)
 
 void ObDASCacheResult::reset() {
   // TODO: when does this function be called?
+  fetched_ = false;
   output_exprs_ = nullptr;
   eval_ctx_ = nullptr;
   handle_.handle_.reset();
