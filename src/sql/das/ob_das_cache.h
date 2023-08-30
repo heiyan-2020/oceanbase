@@ -35,7 +35,7 @@ public:
   virtual int64_t size() const override;
   virtual int deep_copy(char *buf, const int64_t buf_len, ObIKVCacheKey *&key) const override;
   bool is_valid() const;
-  TO_STRING_KV(K_(tenant_id), K_(tablet_id), K_(rowkey));
+  TO_STRING_KV(K_(tenant_id), K_(tablet_id), K_(rowkey), K_(rowkey_size));
 private:
   uint64_t tenant_id_;
   ObTabletID tablet_id_;

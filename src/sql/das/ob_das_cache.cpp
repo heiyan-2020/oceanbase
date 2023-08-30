@@ -182,8 +182,6 @@ int ObDASCache::get_row(const ObDASCacheKey &key, ObDASCacheValueHandle &handle)
   } else if (OB_FAIL(get(key, value, handle.handle_))) {
     if (OB_UNLIKELY(OB_ENTRY_NOT_EXIST != ret)) {
       LOG_WARN("fail to get key from row cache", K(ret));
-    } else {
-      LOG_WARN("das cache: miss", K(key));
     }
   } else {
     if (OB_ISNULL(value)) {
@@ -191,7 +189,6 @@ int ObDASCache::get_row(const ObDASCacheKey &key, ObDASCacheValueHandle &handle)
       LOG_WARN("unexpected error, the value must not be NULL", K(ret));
     } else {
       handle.value_ = const_cast<ObDASCacheValue *>(value);
-      LOG_WARN("das cache: hit", K(key));
     }
   }
 
@@ -230,8 +227,12 @@ int ObDASCacheFetcher::get_row(const ObRowkey &key, ObDASCacheValueHandle &handl
     cache_key.init(MTL_ID(), tablet_id_, key);
     if (OB_FAIL(ObDASCache::get_instance().get_row(cache_key, handle))) {
       if (OB_ENTRY_NOT_EXIST != ret) {
-        STORAGE_LOG(WARN, "fail to get row from das row cache", K(ret), K(cache_key));
+        STORAGE_LOG(WARN, "fail to get row from das row cache", K(ret), K(key));
+      } else {
+        LOG_WARN("das cache: miss", K(key));
       }
+    } else {
+      LOG_WARN("das cache: hit", K(key));
     }
   }
 
