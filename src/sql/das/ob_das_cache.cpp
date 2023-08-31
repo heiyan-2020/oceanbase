@@ -182,8 +182,6 @@ int ObDASCache::get_row(const ObDASCacheKey &key, ObDASCacheValueHandle &handle)
   } else if (OB_FAIL(get(key, value, handle.handle_))) {
     if (OB_UNLIKELY(OB_ENTRY_NOT_EXIST != ret)) {
       LOG_WARN("fail to get key from row cache", K(ret));
-    } else {
-      LOG_WARN("das cache: miss");
     }
   } else {
     if (OB_ISNULL(value)) {
@@ -191,7 +189,6 @@ int ObDASCache::get_row(const ObDASCacheKey &key, ObDASCacheValueHandle &handle)
       LOG_WARN("unexpected error, the value must not be NULL", K(ret));
     } else {
       handle.value_ = const_cast<ObDASCacheValue *>(value);
-      LOG_WARN("das cache: hit");
     }
   }
 
@@ -208,7 +205,7 @@ int ObDASCache::put_row(const ObDASCacheKey &key, ObDASCacheValue &value) {
   }
 
   uint64_t cache_cnt = count(key.get_tenant_id());
-  LOG_WARN("das cache: put", K(cache_cnt), K(key), K(value));
+  LOG_INFO("das cache: put", K(cache_cnt), K(key), K(value));
   return ret;
 }
 
@@ -232,10 +229,10 @@ int ObDASCacheFetcher::get_row(const ObRowkey &key, ObDASCacheValueHandle &handl
       if (OB_ENTRY_NOT_EXIST != ret) {
         STORAGE_LOG(WARN, "fail to get row from das row cache", K(ret), K(key));
       } else {
-        LOG_WARN("das cache: miss", K(key));
+        LOG_INFO("das cache: miss", K(key));
       }
     } else {
-      LOG_WARN("das cache: hit", K(key));
+      LOG_INFO("das cache: hit", K(key));
     }
   }
 
