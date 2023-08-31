@@ -140,7 +140,6 @@ int ObTscCgService::generate_tsc_ctdef(ObLogTableScan &op, ObTableScanCtDef &tsc
       tsc_ctdef.lookup_ctdef_ = new(lookup_buf) ObDASScanCtDef(cg_.phy_plan_->get_allocator());
       tsc_ctdef.lookup_ctdef_->ref_table_id_ = op.get_real_ref_table_id();
       tsc_ctdef.lookup_ctdef_->use_row_cache_ = op.get_plan()->get_optimizer_context().get_global_hint().use_row_cache_;
-      LOG_WARN("das cache trace 1", K(tsc_ctdef.lookup_ctdef_->use_row_cache_));
       tsc_ctdef.lookup_loc_meta_ = new(loc_meta_buf) ObDASTableLocMeta(cg_.phy_plan_->get_allocator());
 
       if (OB_FAIL(generate_das_scan_ctdef(op, *tsc_ctdef.lookup_ctdef_, has_rowscn))) {

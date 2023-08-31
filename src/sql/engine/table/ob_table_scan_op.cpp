@@ -3237,8 +3237,6 @@ int ObGlobalIndexLookupOpImpl::do_index_lookup()
 
   int ret = das_ref_.execute_all_task();
 
-  LOG_WARN("das cache trace 2", K(get_lookup_ctdef()->use_row_cache_));
-
   if (OB_SUCC(ret)) {
     lookup_result_ = das_ref_.begin_result_iter();
   }

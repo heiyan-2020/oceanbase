@@ -735,7 +735,6 @@ int ObDASScanResult::get_next_row(ObNewRow *&row)
 int ObDASScanResult::get_next_row()
 {
   int ret = OB_SUCCESS;
-  LOG_WARN("das cache trace 3", K(use_row_cache_));
   if (use_row_cache_) {
     const ObChunkDatumStore::StoredRow *sr = NULL;
     if (OB_FAIL(result_iter_.get_next_row(sr))) {
