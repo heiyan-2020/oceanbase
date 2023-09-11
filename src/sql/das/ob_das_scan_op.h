@@ -41,6 +41,7 @@ public:
       result_output_(alloc),
       is_get_(false),
       is_external_table_(false),
+      use_row_cache_(false),
       external_file_access_info_(alloc),
       external_file_location_(alloc),
       external_files_(alloc),
