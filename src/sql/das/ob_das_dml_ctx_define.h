@@ -200,8 +200,9 @@ typedef DASDMLRtDefArray DASUpdRtDefArray;
 struct ObDASDelCtDef : ObDASDMLBaseCtDef
 {
   ObDASDelCtDef(common::ObIAllocator &alloc)
-    : ObDASDMLBaseCtDef(alloc, DAS_OP_TABLE_DELETE)
+    : ObDASDMLBaseCtDef(alloc, DAS_OP_TABLE_DELETE), use_row_cache_(false)
   { }
+  bool use_row_cache_;
 };
 typedef DASDMLCtDefArray DASDelCtDefArray;
 
