@@ -74,7 +74,8 @@ public:
       uint64_t is_ignore_                       : 1;
       uint64_t is_batch_stmt_                   : 1;
       uint64_t is_insert_up_                    : 1;
-      uint64_t reserved_                        : 61;
+      uint64_t use_row_cache_                   : 1;
+      uint64_t reserved_                        : 60;
     };
   };
 protected:
@@ -200,9 +201,8 @@ typedef DASDMLRtDefArray DASUpdRtDefArray;
 struct ObDASDelCtDef : ObDASDMLBaseCtDef
 {
   ObDASDelCtDef(common::ObIAllocator &alloc)
-    : ObDASDMLBaseCtDef(alloc, DAS_OP_TABLE_DELETE), use_row_cache_(false)
+    : ObDASDMLBaseCtDef(alloc, DAS_OP_TABLE_DELETE)
   { }
-  bool use_row_cache_;
 };
 typedef DASDMLCtDefArray DASDelCtDefArray;
 

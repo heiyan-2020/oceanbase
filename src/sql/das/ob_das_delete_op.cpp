@@ -167,6 +167,7 @@ int ObDASDeleteOp::write_row(const ExprFixedArray &row,
   int ret = OB_SUCCESS;
   bool added = false;
   buffer_full = false;
+  LOG_WARN("[das cache] [debug] hint", K(del_ctdef_->use_row_cache_));
   if (!write_buffer_.is_inited()) {
     ret = OB_ERR_UNEXPECTED;
     LOG_WARN("buffer not inited", K(ret));
