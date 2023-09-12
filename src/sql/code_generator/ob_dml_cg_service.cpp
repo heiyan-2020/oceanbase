@@ -1398,6 +1398,7 @@ int ObDmlCgService::generate_das_del_ctdef(ObLogDelUpd &op,
     LOG_WARN("add old row projector failed", K(ret), K(old_row));
   } else {
     das_del_ctdef.use_row_cache_ = op.get_plan()->get_optimizer_context().get_global_hint().use_row_cache_;
+    das_del_ctdef.is_primary_index_ = index_dml_info.is_primary_index_;
   }
   return ret;
 }

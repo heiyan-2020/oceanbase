@@ -75,7 +75,8 @@ public:
       uint64_t is_batch_stmt_                   : 1;
       uint64_t is_insert_up_                    : 1;
       uint64_t use_row_cache_                   : 1;
-      uint64_t reserved_                        : 60;
+      uint64_t is_primary_index_                : 1;
+      uint64_t reserved_                        : 59;
     };
   };
 protected:
