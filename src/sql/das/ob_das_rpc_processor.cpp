@@ -348,6 +348,8 @@ int ObDASInvalidateP::process()
     res.succ_ = false;
   }
 
+  LOG_WARN("[das cache] process", K(ret), K(res.succ_), K(rowkey));
+
   return ret;
 }
 

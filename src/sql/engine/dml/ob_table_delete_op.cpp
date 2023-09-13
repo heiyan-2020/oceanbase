@@ -321,10 +321,6 @@ OB_INLINE int ObTableDeleteOp::delete_row_to_das()
 int ObTableDeleteOp::extract_rowkey(ObDASTabletLoc *tablet_loc, const ObDelCtDef &del_ctdef, ObRowkey& rowkey) {
   int ret = OB_SUCCESS;
 
-  if (del_ctdef.is_primary_index_) {
-
-  }
-
   ObEvalCtx &eval_ctx = get_eval_ctx();
   int pk_cols = del_ctdef.das_ctdef_.rowkey_cnt_;
   common::ObIAllocator& allocator = dml_rtctx_.get_das_alloc();
@@ -342,6 +338,8 @@ int ObTableDeleteOp::extract_rowkey(ObDASTabletLoc *tablet_loc, const ObDelCtDef
 
     rowkey.assign(obj_array, pk_cols);
   }
+
+  LOG_WARN("[das cache] [debug] extract_rowkey", K(rowkey), K(ret));
 
   return ret;
 }

@@ -607,6 +607,8 @@ int ObDataAccessService::invalidate_row(uint64_t tenant_id, ObDASTabletLoc *tabl
     LOG_WARN("[das cache] invalidate failed");
   }
 
+  LOG_WARN("[das cache] [debug] send invalidate rpc", K(ret), K(task_resp.succ_));
+
   return ret;
 }
 
