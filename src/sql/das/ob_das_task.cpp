@@ -600,7 +600,7 @@ int DASOpResultIter::reset_wild_datums_ptr()
   return ret;
 }
 
-OB_SERIALIZE_MEMBER(ObDASInvalidateReq, tenant_id_, tablet_id, rowkey_);
+OB_SERIALIZE_MEMBER(ObDASInvalidateReq, tenant_id_, tablet_id_, rowkey_);
 
 int ObDASInvalidateReq::init(const uint64_t tenant_id, common::ObTabletID& tablet_id, ObRowkey& rowkey) {
   tenant_id_ = tenant_id;
