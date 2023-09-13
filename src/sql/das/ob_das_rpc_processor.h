@@ -141,7 +141,7 @@ private:
   DISALLOW_COPY_AND_ASSIGN(ObDASSyncFetchP);
 };
 
-class ObDASAsyncEraseP : public ObDASInvalidateRpcProcessor
+class ObDASAsyncEraseP : public ObDASAsyncEraseResRpcProcessor
 {
 public:
   ObDASAsyncEraseP() {}

@@ -537,7 +537,6 @@ public:
 public:
   bool is_success() { return succ_; }
   TO_STRING_KV(K_(succ));
-private:
   bool succ_;
 };
 
