@@ -600,11 +600,15 @@ int DASOpResultIter::reset_wild_datums_ptr()
   return ret;
 }
 
+OB_SERIALIZE_MEMBER(ObDASInvalidateReq, tenant_id_, tablet_id, rowkey_);
+
 int ObDASInvalidateReq::init(const uint64_t tenant_id, common::ObTabletID& tablet_id, ObRowkey& rowkey) {
   tenant_id_ = tenant_id;
   tablet_id_ = tablet_id;
   rowkey_ = rowkey;
   return OB_SUCCESS;
 }
+
+OB_SERIALIZE_MEMBER(ObDASInvalidateRes, succ_);
 }  // namespace sql
 }  // namespace oceanbase
