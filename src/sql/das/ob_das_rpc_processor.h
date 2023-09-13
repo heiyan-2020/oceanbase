@@ -31,6 +31,7 @@ namespace sql
 {
 typedef obrpc::ObRpcProcessor<obrpc::ObDASRpcProxy::ObRpc<obrpc::OB_DAS_SYNC_FETCH_RESULT> > ObDASSyncFetchResRpcProcessor;
 typedef obrpc::ObRpcProcessor<obrpc::ObDASRpcProxy::ObRpc<obrpc::OB_DAS_ASYNC_ERASE_RESULT> > ObDASAsyncEraseResRpcProcessor;
+typedef obrpc::ObRpcProcessor<obrpc::ObDASRpcProxy::ObRpc<obrpc::OB_DAS_INVALIDATE> > ObDASInvalidateRpcProcessor;
 
 template<obrpc::ObRpcPacketCode pcode>
 class ObDASBaseAccessP : public obrpc::ObRpcProcessor<obrpc::ObDASRpcProxy::ObRpc<pcode>>
@@ -140,7 +141,7 @@ private:
   DISALLOW_COPY_AND_ASSIGN(ObDASSyncFetchP);
 };
 
-class ObDASAsyncEraseP : public ObDASAsyncEraseResRpcProcessor
+class ObDASAsyncEraseP : public ObDASInvalidateRpcProcessor
 {
 public:
   ObDASAsyncEraseP() {}
@@ -150,7 +151,7 @@ private:
   DISALLOW_COPY_AND_ASSIGN(ObDASAsyncEraseP);
 };
 
-class ObDASInvalidateP : public ObDASAsyncEraseResRpcProcessor
+class ObDASInvalidateP : public ObDASInvalidateRpcProcessor
 {
 public:
   ObDASInvalidateP() {}

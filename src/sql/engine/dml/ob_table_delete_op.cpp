@@ -330,7 +330,7 @@ int ObTableDeleteOp::extract_rowkey(ObDASTabletLoc *tablet_loc, const ObDelCtDef
   common::ObIAllocator& allocator = dml_rtctx_.get_das_alloc();
 
   ExprFixedArray& row = del_ctdef.old_row_;
-  ObjMetaFixedArray col_types = del_ctdef.das_ctdef_.column_types_
+  const ObjMetaFixedArray col_types = del_ctdef.das_ctdef_.column_types_;
   ObObj* obj_array = reinterpret_cast<common::ObObj*>(allocator.alloc((sizeof(common::ObObj) * pk_cols)));
   if (OB_ISNULL(obj_array)) {
     ret = OB_ERR_UNEXPECTED;

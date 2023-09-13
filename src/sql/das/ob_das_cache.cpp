@@ -213,7 +213,7 @@ int ObDASCache::invalidate_row(const ObDASCacheKey &key) {
   int ret = OB_SUCCESS;
   if (OB_UNLIKELY(!key.is_valid())) {
     ret = OB_INVALID_ARGUMENT;
-    LOG_WARN("invalid arguments", K(ret), K(key), K(value));
+    LOG_WARN("invalid arguments", K(ret), K(key));
   } else if (OB_FAIL(erase(key))) {
     LOG_WARN("fail to erase row");
   }

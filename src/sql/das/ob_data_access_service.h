@@ -54,6 +54,7 @@ public:
                         const ObIDASTaskOp *task_op,
                         ObDASExtraData *&extra_result);
   int process_task_resp(ObDASRef &das_ref, const ObDASTaskResp &task_resp, const common::ObSEArray<ObIDASTaskOp*, 2> &task_ops);
+  int invalidate_row(uint64_t tenant_id, ObDASTabletLoc *tablet_loc, ObRowkey& rowkey);
 private:
   int execute_dist_das_task(ObDASRef &das_ref,
       ObDasAggregatedTasks &task_ops, bool async = true);
@@ -65,7 +66,6 @@ private:
   int collect_das_task_info(ObDASTaskArg &task_arg, ObDASRemoteInfo &remote_info);
   void calc_das_task_parallelism(const ObDASRef &das_ref, const ObDasAggregatedTasks &task_ops, int &target_parallelism);
   int remove_if_cache_hit(ObDASRef &das_ref, ObDasAggregatedTasks &agg_ops, ObDASTaskArg &task_arg);
-  int invalidate_row(uint64_t tenant_id, ObDASTabletLoc *tablet_loc, ObRowkey& rowkey);
 private:
   obrpc::ObDASRpcProxy das_rpc_proxy_;
   common::ObAddr ctrl_addr_;
