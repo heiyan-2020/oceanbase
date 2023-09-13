@@ -84,6 +84,7 @@ public:
   static ObDASCache &get_instance();
   int get_row(const ObDASCacheKey &key, ObDASCacheValueHandle &handle);
   int put_row(const ObDASCacheKey &key, ObDASCacheValue &value);
+  int invalidate_row(const ObDASCacheKey &key);
 
   ObArenaAllocator rowkey_allocator_;
 private:
@@ -98,6 +99,7 @@ public:
   int init(const ObTabletID &tablet_id);
   int get_row(const ObRowkey &key, ObDASCacheValueHandle &handler);
   int put_row(const ObChunkDatumStore::StoredRow *row, const ObIArray<ObColDesc> *desc);
+  int invalidate_row(const ObRowkey &key);
 
 private:
   /**

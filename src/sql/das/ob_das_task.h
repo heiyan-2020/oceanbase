@@ -526,6 +526,39 @@ private:
   uint64_t tenant_id_;
   int64_t task_id_;
 };
+
+
+class ObDASInvalidateRes
+{
+  OB_UNIS_VERSION(1);
+public:
+  ObDASInvalidateRes() : succ_(false) {}
+  ~ObDASInvalidateRes() {}
+public:
+  bool is_success() { return succ_; }
+  TO_STRING_KV(K_(succ));
+private:
+  bool succ_;
+};
+
+class ObDASInvalidateReq
+{
+  OB_UNIS_VERSION(1);
+public:
+  ObDASInvalidateReq() : tenant_id_(0) {}
+  ~ObDASInvalidateReq() {}
+  int init(const uint64_t tenant_id, common::ObTabletID& tablet_id, ObRowkey& rowkey);
+public:
+  uint64_t get_tenant_id() { return tenant_id_; }
+  common::ObTabletID& get_tablet_id_() { return tablet_id_; }
+  ObRowkey& get_rowkey() { return rowkey_; }
+  TO_STRING_KV(K_(tenant_id), K_(tablet_id), K_(rowkey));
+private:
+  uint64_t tenant_id_;
+  common::ObTabletID tablet_id_;
+  ObRowkey rowkey_;
+};
+
 }  // namespace sql
 }  // namespace oceanbase
 #endif /* OBDEV_SRC_SQL_DAS_OB_DAS_TASK_H_ */

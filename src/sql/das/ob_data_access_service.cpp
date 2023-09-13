@@ -592,6 +592,24 @@ int ObDataAccessService::remove_if_cache_hit(ObDASRef &das_ref, ObDasAggregatedT
   return ret;
 }
 
+int ObDataAccessService::invalidate_row(uint64_t tenant_id, ObDASTabletLoc *tablet_loc, ObRowkey& rowkey) {
+  int ret = OB_SUCCESS;
+  ObDASInvalidateReq task_arg;
+  ObDASInvalidateRes task_resp;
+
+  task_arg.init(tenant_id, tablet_loc->tablet_id_, rowkey);
+
+  if (OB_FAIL(das_rpc_proxy_
+           .to(tablet_loc->server_)
+           .by(tenant_id)
+           .timeout(1)
+           .invalidate(task_arg, task_resp))) {
+    LOG_WARN("[das cache] invalidate failed");
+  }
+
+  return ret;
+}
+
 int ObDataAccessService::process_task_resp(ObDASRef &das_ref, const ObDASTaskResp &task_resp, const common::ObSEArray<ObIDASTaskOp*, 2> &task_ops)
 {
   int ret = OB_SUCCESS;

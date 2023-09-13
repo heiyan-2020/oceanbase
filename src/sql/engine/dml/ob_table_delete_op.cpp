@@ -263,6 +263,7 @@ OB_INLINE int ObTableDeleteOp::delete_row_to_das()
     const ObTableDeleteSpec::DelCtDefArray &ctdefs = MY_SPEC.del_ctdefs_.at(i);
     DelRtDefArray &rtdefs = del_rtdefs_.at(i);
     bool is_skipped = false;
+    ObRowkey rowkey;
     for (int64_t j = 0; OB_SUCC(ret) && j < ctdefs.count(); ++j) {
       //delete each table with fetched row
       const ObDelCtDef &del_ctdef = *ctdefs.at(j);
@@ -270,6 +271,7 @@ OB_INLINE int ObTableDeleteOp::delete_row_to_das()
       ObDASTabletLoc *tablet_loc = nullptr;
       ObDMLModifyRowNode modify_row(this, &del_ctdef, &del_rtdef, ObDmlEventType::DE_DELETING);
       bool is_skipped = false;
+
       if (OB_FAIL(ObDMLService::process_delete_row(del_ctdef, del_rtdef, is_skipped, *this))) {
         LOG_WARN("process delete row failed", K(ret));
       } else if (OB_UNLIKELY(is_skipped)) {
@@ -280,6 +282,10 @@ OB_INLINE int ObTableDeleteOp::delete_row_to_das()
         LOG_WARN("calc partition key failed", K(ret));
       } else if (OB_FAIL(ObDMLService::delete_row(del_ctdef, del_rtdef, tablet_loc, dml_rtctx_, modify_row.old_row_))) {
         LOG_WARN("insert row with das failed", K(ret));
+      } else if (del_ctdef.is_primary_index_ && OB_FAIL(extract_rowkey(tablet_loc, del_ctdef, rowkey))) {
+        LOG_WARN("extract rowkey failed", K(ret));
+      } else if (!del_ctdef.is_primary_index_ && MTL(ObDataAccessService *)->invalidate_row(MTL_ID(), tablet_loc, rowkey)) {
+        LOG_WARN("invalidate row failed", K(ret));
       } else if (need_after_row_process(del_ctdef) && OB_FAIL(dml_modify_rows_.push_back(modify_row))) {
         LOG_WARN("failed to push dml modify row to modified row list", K(ret));
       } else if (!MY_SPEC.del_ctdefs_.at(0).at(0)->has_instead_of_trigger_) {
@@ -307,6 +313,34 @@ OB_INLINE int ObTableDeleteOp::delete_row_to_das()
       clear_evaluated_flag();
       err_log_rt_def_.curr_err_log_record_num_++;
     }
+  }
+
+  return ret;
+}
+
+int ObTableDeleteOp::extract_rowkey(ObDASTabletLoc *tablet_loc, const ObDelCtDef &del_ctdef, ObRowkey& rowkey) {
+  int ret = OB_SUCCESS;
+
+  if (del_ctdef.is_primary_index_) {
+
+  }
+
+  ObEvalCtx &eval_ctx = get_eval_ctx();
+  int pk_cols = del_ctdef.das_ctdef_.rowkey_cnt_;
+  common::ObIAllocator& allocator = dml_rtctx_.get_das_alloc();
+
+  ExprFixedArray& row = del_ctdef.old_row_;
+  ObjMetaFixedArray col_types = del_ctdef.das_ctdef_.column_types_
+  ObObj* obj_array = reinterpret_cast<common::ObObj*>(allocator.alloc((sizeof(common::ObObj) * pk_cols)));
+  if (OB_ISNULL(obj_array)) {
+    ret = OB_ERR_UNEXPECTED;
+  } else {
+    for (uint64_t i = 0; i < pk_cols; i++) {
+      ObDatum& col = row.at(i)->locate_expr_datum(eval_ctx);
+      col.to_obj(obj_array[i], col_types.at(i));
+    }
+
+    rowkey.assign(obj_array, pk_cols);
   }
 
   return ret;

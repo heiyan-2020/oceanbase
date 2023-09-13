@@ -209,6 +209,20 @@ int ObDASCache::put_row(const ObDASCacheKey &key, ObDASCacheValue &value) {
   return ret;
 }
 
+int ObDASCache::invalidate_row(const ObDASCacheKey &key) {
+  int ret = OB_SUCCESS;
+  if (OB_UNLIKELY(!key.is_valid())) {
+    ret = OB_INVALID_ARGUMENT;
+    LOG_WARN("invalid arguments", K(ret), K(key), K(value));
+  } else if (OB_FAIL(erase(key))) {
+    LOG_WARN("fail to erase row");
+  }
+
+  LOG_INFO("das cache: invalidate", K(key));
+
+  return ret;
+}
+
 int ObDASCacheFetcher::init(const ObTabletID &tablet_id) {
   tablet_id_ = tablet_id;
   is_inited_ = true;
@@ -253,9 +267,21 @@ int ObDASCacheFetcher::put_row(const ObChunkDatumStore::StoredRow *row, const Ob
     LOG_WARN("Failed to init cache value", K(ret));
   } else if (OB_FAIL(ObDASCache::get_instance().put_row(cache_key, cache_value))) {
     LOG_WARN("Failed to init put cache", K(ret));
-  } else {
-    LOG_DEBUG("update row cache successfully", K(cache_key));
   }
+
+  return ret;
+}
+
+int ObDASCacheFetcher::invalidate_row(const ObRowkey &key) {
+  int ret = OB_SUCCESS;
+  ObDASCacheKey cache_key;
+
+  if (OB_FAIL(cache_key.init(MTL_ID(), tablet_id_, key))) {
+    LOG_WARN("Failed to init cache key", K(ret));
+  } else if (OB_FAIL(ObDASCache::get_instance().invalidate_row(cache_key))) {
+    LOG_WARN("Failed to uinvalidate cache", K(ret));
+  }
+
   return ret;
 }
 

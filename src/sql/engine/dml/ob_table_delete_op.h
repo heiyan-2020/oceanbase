@@ -94,6 +94,7 @@ protected:
   int check_delete_affected_row();
   virtual int write_row_to_das_buffer() override;
   virtual int check_need_exec_single_row() override;
+  int extract_rowkey(ObDASTabletLoc *tablet_loc, const ObDelCtDef &del_ctdef, ObRowkey& rowkey);
 protected:
   DelRtDef2DArray del_rtdefs_;  //see the comment of DelCtDef2DArray
   ObErrLogService err_log_service_;

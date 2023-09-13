@@ -18,6 +18,8 @@
 #include "observer/ob_server_struct.h"
 #include "storage/tx/ob_trans_service.h"
 #include "observer/ob_srv_network_frame.h"
+#include "sql/das/ob_das_cache.h"
+
 namespace oceanbase
 {
 namespace sql
@@ -327,5 +329,27 @@ int ObDASAsyncEraseP::process()
   }
   return ret;
 }
+
+int ObDASInvalidateP::process()
+{
+  int ret = OB_SUCCESS;
+  ObDASInvalidateReq &req = arg_;
+  ObDASInvalidateRes &res = result_;
+  const uint64_t tenant_id = req.get_tenant_id();
+  const common::ObTabletID& tablet_id = req.get_tablet_id_();
+  ObRowkey &rowkey = req.get_rowkey();
+  res.succ_ = true;
+
+  ObDASCacheFetcher cache_fetcher;
+  cache_fetcher.init(tablet_id);
+
+  if (OB_FAIL(cache_fetcher.invalidate_row(rowkey))) {
+    LOG_WARN("invalidate rowfailed", K(ret));
+    res.succ_ = false;
+  }
+
+  return ret;
+}
+
 }  // namespace sql
 }  // namespace oceanbase

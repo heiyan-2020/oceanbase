@@ -65,6 +65,7 @@ private:
   int collect_das_task_info(ObDASTaskArg &task_arg, ObDASRemoteInfo &remote_info);
   void calc_das_task_parallelism(const ObDASRef &das_ref, const ObDasAggregatedTasks &task_ops, int &target_parallelism);
   int remove_if_cache_hit(ObDASRef &das_ref, ObDasAggregatedTasks &agg_ops, ObDASTaskArg &task_arg);
+  int invalidate_row(uint64_t tenant_id, ObDASTabletLoc *tablet_loc, ObRowkey& rowkey);
 private:
   obrpc::ObDASRpcProxy das_rpc_proxy_;
   common::ObAddr ctrl_addr_;

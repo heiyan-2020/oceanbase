@@ -149,6 +149,16 @@ public:
 private:
   DISALLOW_COPY_AND_ASSIGN(ObDASAsyncEraseP);
 };
+
+class ObDASInvalidateP : public ObDASAsyncEraseResRpcProcessor
+{
+public:
+  ObDASInvalidateP() {}
+  ~ObDASInvalidateP() {}
+  int process();
+private:
+  DISALLOW_COPY_AND_ASSIGN(ObDASInvalidateP);
+};
 }  // namespace sql
 }  // namespace oceanbase
 #endif /* OBDEV_SRC_SQL_DAS_OB_DAS_RPC_PROCESSOR_H_ */
