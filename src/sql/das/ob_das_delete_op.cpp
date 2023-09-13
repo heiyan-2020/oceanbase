@@ -82,8 +82,6 @@ int ObDASDeleteOp::open_op()
   int64_t affected_rows = 0;
   ObDASDMLIterator dml_iter(del_ctdef_, write_buffer_, op_alloc_);
   ObDASIndexDMLAdaptor<DAS_OP_TABLE_DELETE, ObDASDMLIterator> del_adaptor;
-  LOG_WARN("[das cache]", K(del_ctdef_->use_row_cache_));
-  LOG_WARN("[das cache] index type", K(del_ctdef_->is_primary_index_));
   del_adaptor.tx_desc_ = trans_desc_;
   del_adaptor.snapshot_ = snapshot_;
   del_adaptor.ctdef_ = del_ctdef_;
@@ -169,7 +167,7 @@ int ObDASDeleteOp::write_row(const ExprFixedArray &row,
   int ret = OB_SUCCESS;
   bool added = false;
   buffer_full = false;
-  LOG_WARN("[das cache] [debug] hint", K(del_ctdef_->use_row_cache_));  if (!write_buffer_.is_inited()) {
+  if (!write_buffer_.is_inited()) {
     ret = OB_ERR_UNEXPECTED;
     LOG_WARN("buffer not inited", K(ret));
   } else if (OB_FAIL(write_buffer_.try_add_row(row, &eval_ctx, das::OB_DAS_MAX_PACKET_SIZE, stored_row, added, true))) {
