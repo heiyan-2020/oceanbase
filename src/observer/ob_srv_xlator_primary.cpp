@@ -237,9 +237,9 @@ void oceanbase::observer::init_srv_xlator_for_executor(ObSrvRpcXlator *xlator) {
   RPC_PROCESSOR(ObDASSyncAccessP, gctx_);
   RPC_PROCESSOR(ObDASSyncFetchP);
   RPC_PROCESSOR(ObDASAsyncEraseP);
-  RPC_PROCESSOR(ObDASInvalidateP);
-  RPC_PROCESSOR(ObDASAsyncEraseP)  RPC_PROCESSOR(ObRpcEraseIntermResultP, gctx_);
+  RPC_PROCESSOR(ObRpcEraseIntermResultP, gctx_);
   RPC_PROCESSOR(ObDASAsyncAccessP, gctx_);
   RPC_PROCESSOR(ObFlushExternalTableKVCacheP);
   RPC_PROCESSOR(ObAsyncLoadExternalTableFileListP);
+  RPC_PROCESSOR(ObDASInvalidateP);
 }
