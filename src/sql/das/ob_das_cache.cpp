@@ -192,6 +192,10 @@ int ObDASCache::get_row(const ObDASCacheKey &key, ObDASCacheValueHandle &handle)
     }
   }
 
+  uint64_t cache_cnt = count(key.get_tenant_id());
+  LOG_INFO("das cache: get", K(cache_cnt), K(key));
+
+
   return ret;
 }
 
@@ -215,10 +219,12 @@ int ObDASCache::invalidate_row(const ObDASCacheKey &key) {
     ret = OB_INVALID_ARGUMENT;
     LOG_WARN("invalid arguments", K(ret), K(key));
   } else if (OB_FAIL(erase(key))) {
-    LOG_WARN("fail to erase row");
+    if (OB_UNLIKELY(OB_ENTRY_NOT_EXIST == ret)) {
+      ret = OB_SUCCESS;
+    }
   }
 
-  LOG_INFO("das cache: invalidate", K(key));
+  LOG_INFO("[das cache]: invalidate", K(key), K(ret));
 
   return ret;
 }
@@ -279,7 +285,7 @@ int ObDASCacheFetcher::invalidate_row(const ObRowkey &key) {
   if (OB_FAIL(cache_key.init(MTL_ID(), tablet_id_, key))) {
     LOG_WARN("Failed to init cache key", K(ret));
   } else if (OB_FAIL(ObDASCache::get_instance().invalidate_row(cache_key))) {
-    LOG_WARN("Failed to uinvalidate cache", K(ret));
+    LOG_WARN("Failed to invalidate cache", K(ret));
   }
 
   return ret;
