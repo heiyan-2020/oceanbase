@@ -602,7 +602,7 @@ int ObDataAccessService::invalidate_row(uint64_t tenant_id, ObDASTabletLoc *tabl
   if (OB_FAIL(das_rpc_proxy_
            .to(tablet_loc->server_)
            .by(tenant_id)
-           .timeout(1)
+           .timeout(1000000)
            .invalidate(task_arg, task_resp))) {
     LOG_WARN("[das cache] invalidate failed");
   }
