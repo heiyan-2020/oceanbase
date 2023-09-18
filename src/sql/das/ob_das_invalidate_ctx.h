@@ -8,6 +8,8 @@
 #ifndef OB_DAS_INVALIDATE_CTX_H_
 #define OB_DAS_INVALIDATE_CTX_H_
 
+#define USING_LOG_PREFIX SQL
+
 #include "lib/lock/ob_thread_cond.h"
 #include "lib/atomic/ob_atomic.h"
 #include "lib/oblog/ob_log.h"
