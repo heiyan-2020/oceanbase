@@ -20,6 +20,8 @@
 #include "sql/das/ob_das_define.h"
 #include "sql/das/ob_das_factory.h"
 #include "sql/engine/ob_des_exec_context.h"
+#include "storage/tx/ob_trans_define_v4.h"
+
 
 namespace oceanbase
 {
@@ -114,8 +116,8 @@ public:
     result_.set_das_factory(&context->get_das_ref().get_das_factory());
   }
   ~ObRpcDasAsyncAccessCallBack() = default;
-  void on_timeout() override;
   void on_invalid() override;
+  void on_timeout() override;
   void set_args(const Request &arg);
   oceanbase::rpc::frame::ObReqTransport::AsyncCB *clone(
       const oceanbase::rpc::frame::SPAlloc &alloc) const;
@@ -128,6 +130,21 @@ public:
   ObDasAsyncRpcCallBackContext *get_async_cb_context() { return context_; };
 private:
   ObDasAsyncRpcCallBackContext *context_;
+};
+
+
+class ObRpcInvalidateCallBack : public obrpc::ObDASRpcProxy::AsyncCB<obrpc::OB_DAS_INVALIDATE>
+{
+public:
+  ObRpcInvalidateCallBack(transaction::ObInvalidateCtx *context) : context_(context) {}
+  ~ObRpcInvalidateCallBack() = default;
+  void set_args(const Request &arg);
+  virtual int process() override;
+  oceanbase::rpc::frame::ObReqTransport::AsyncCB *clone(
+        const oceanbase::rpc::frame::SPAlloc &alloc) const;
+  transaction::ObInvalidateCtx *get_context() { return context_; }
+private:
+  transaction::ObInvalidateCtx *context_;
 };
 
 class ObDASSyncFetchP : public ObDASSyncFetchResRpcProcessor

@@ -272,6 +272,13 @@ OB_INLINE int ObTableDeleteOp::delete_row_to_das()
       ObDMLModifyRowNode modify_row(this, &del_ctdef, &del_rtdef, ObDmlEventType::DE_DELETING);
       bool is_skipped = false;
 
+      if (del_ctdef.das_ctdef_.use_row_cache_ && !del_ctdef.is_primary_index_) {
+        ObSQLSessionInfo *session = dml_rtctx_.get_exec_ctx().get_my_session();
+        ObRpcInvalidateCallBack* invalidate_cb = nullptr;
+        dml_rtctx_.das_ref_.get_das_factory().create_invalidate_async_cb(invalidate_cb, session->get_tx_desc()->get_invalidate_ctx());
+        LOG_WARN("das cache: create invalidate callback", invalidate_cb);
+      }
+
       if (OB_FAIL(ObDMLService::process_delete_row(del_ctdef, del_rtdef, is_skipped, *this))) {
         LOG_WARN("process delete row failed", K(ret));
       } else if (OB_UNLIKELY(is_skipped)) {

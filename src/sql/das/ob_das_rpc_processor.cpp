@@ -258,6 +258,29 @@ oceanbase::rpc::frame::ObReqTransport::AsyncCB *ObRpcDasAsyncAccessCallBack::clo
       static_cast<const rpc::frame::ObReqTransport::AsyncCB * const>(this));
 }
 
+void ObRpcInvalidateCallBack::set_args(const Request &arg)
+{
+  UNUSED(arg);
+}
+
+int ObRpcInvalidateCallBack::process()
+{
+  int ret = OB_SUCCESS;
+  LOG_DEBUG("das cache: async invalidate process", K_(result));
+  if (OB_FAIL(get_rcode())) {
+    LOG_WARN("das cache: async invalidate failed", K(get_rcode()), K_(result));
+  }
+  context_->set_succ();
+  return ret;
+}
+
+oceanbase::rpc::frame::ObReqTransport::AsyncCB* ObRpcInvalidateCallBack::clone(
+    const oceanbase::rpc::frame::SPAlloc &alloc) const {
+  UNUSED(alloc);
+  return const_cast<rpc::frame::ObReqTransport::AsyncCB *>(
+      static_cast<const rpc::frame::ObReqTransport::AsyncCB * const>(this));
+}
+
 int ObDasAsyncRpcCallBackContext::init(const ObMemAttr &attr)
 {
   alloc_.set_attr(attr);

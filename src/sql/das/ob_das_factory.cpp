@@ -315,6 +315,20 @@ int ObDASTaskFactory::create_das_async_cb(
   return ret;
 }
 
+int ObDASTaskFactory::create_invalidate_async_cb(ObRpcInvalidateCallBack *&async_cb, transaction::ObInvalidateCtx *context)
+{
+  int ret = OB_SUCCESS;
+  void *buffer = nullptr;
+  if (OB_ISNULL(buffer = allocator_.alloc(sizeof(ObRpcInvalidateCallBack)))) {
+    ret = OB_ALLOCATE_MEMORY_FAILED;
+    LOG_WARN("failed to allocate das async cb context memory", K(ret), K(sizeof(ObRpcInvalidateCallBack)));
+  } else {
+    async_cb = new (buffer) ObRpcInvalidateCallBack(context);
+  }
+
+  return ret;
+}
+
 void ObDASTaskFactory::cleanup()
 {
   if (OB_LIKELY(!das_op_store_.empty())) {

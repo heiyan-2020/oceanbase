@@ -44,6 +44,7 @@ public:
                           ObDASRef &das_ref,
                           ObRpcDasAsyncAccessCallBack *&async_cb,
                           int64_t timeout_ts);
+  int create_invalidate_async_cb(ObRpcInvalidateCallBack *&async_cb, transaction::ObInvalidateCtx *context);
   int create_das_cache_result(ObDASCacheResult *&result);
   static int create_das_ctdef(ObDASOpType op_type, common::ObIAllocator &alloc, ObDASBaseCtDef *&ctdef);
   static int create_das_rtdef(ObDASOpType op_type, common::ObIAllocator &alloc, ObDASBaseRtDef *&rtdef);
