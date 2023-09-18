@@ -266,11 +266,11 @@ void ObRpcInvalidateCallBack::set_args(const Request &arg)
 int ObRpcInvalidateCallBack::process()
 {
   int ret = OB_SUCCESS;
-  LOG_DEBUG("das cache: async invalidate process", K_(result));
+  // LOG_DEBUG("das cache: async invalidate process", K_(result));
   if (OB_FAIL(get_rcode())) {
     LOG_WARN("das cache: async invalidate failed", K(get_rcode()), K_(result));
   }
-//  context_->set_succ(1);
+ context_->set_succ(1);
   return ret;
 }
 
@@ -371,7 +371,7 @@ int ObDASInvalidateP::process()
     res.succ_ = false;
   }
 
-  LOG_WARN("[das cache] process", K(ret), K(res.succ_), K(rowkey));
+  // LOG_WARN("[das cache] process", K(ret), K(res.succ_), K(rowkey));
 
   return ret;
 }

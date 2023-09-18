@@ -606,7 +606,7 @@ int ObDataAccessService::invalidate_row(uint64_t tenant_id, ObDASTabletLoc *tabl
     LOG_WARN("[das cache] invalidate failed");
   }
 
-  LOG_WARN("das cache: async call", K(ret));
+  // LOG_WARN("das cache: async call", K(ret));
 
   return ret;
 }

@@ -193,7 +193,7 @@ int ObDASCache::get_row(const ObDASCacheKey &key, ObDASCacheValueHandle &handle)
   }
 
   uint64_t cache_cnt = count(key.get_tenant_id());
-  LOG_INFO("das cache: get", K(cache_cnt), K(key));
+  // LOG_INFO("das cache: get", K(cache_cnt), K(key));
 
 
   return ret;
@@ -209,7 +209,7 @@ int ObDASCache::put_row(const ObDASCacheKey &key, ObDASCacheValue &value) {
   }
 
   uint64_t cache_cnt = count(key.get_tenant_id());
-  LOG_INFO("das cache: put", K(cache_cnt), K(key), K(value));
+  // LOG_INFO("das cache: put", K(cache_cnt), K(key), K(value));
   return ret;
 }
 
@@ -224,7 +224,7 @@ int ObDASCache::invalidate_row(const ObDASCacheKey &key) {
     }
   }
 
-  LOG_INFO("[das cache]: invalidate", K(key), K(ret));
+  // LOG_INFO("[das cache]: invalidate", K(key), K(ret));
 
   return ret;
 }
@@ -249,10 +249,10 @@ int ObDASCacheFetcher::get_row(const ObRowkey &key, ObDASCacheValueHandle &handl
       if (OB_ENTRY_NOT_EXIST != ret) {
         STORAGE_LOG(WARN, "fail to get row from das row cache", K(ret), K(key));
       } else {
-        LOG_INFO("das cache: miss", K(key));
+        // LOG_INFO("das cache: miss", K(key));
       }
     } else {
-      LOG_INFO("das cache: hit", K(key));
+      // LOG_INFO("das cache: hit", K(key));
     }
   }
 

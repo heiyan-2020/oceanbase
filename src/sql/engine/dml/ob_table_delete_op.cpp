@@ -349,7 +349,7 @@ int ObTableDeleteOp::extract_rowkey(ObDASTabletLoc *tablet_loc, const ObDelCtDef
     rowkey.assign(obj_array, pk_cols);
   }
 
-  LOG_WARN("[das cache] [debug] extract_rowkey", K(rowkey), K(ret));
+  // LOG_WARN("[das cache] [debug] extract_rowkey", K(rowkey), K(ret));
 
   return ret;
 }
