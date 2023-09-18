@@ -276,7 +276,7 @@ OB_INLINE int ObTableDeleteOp::delete_row_to_das()
         ObSQLSessionInfo *session = dml_rtctx_.get_exec_ctx().get_my_session();
         ObRpcInvalidateCallBack* invalidate_cb = nullptr;
         dml_rtctx_.das_ref_.get_das_factory().create_invalidate_async_cb(invalidate_cb, session->get_tx_desc()->get_invalidate_ctx());
-        LOG_WARN("das cache: create invalidate callback", invalidate_cb);
+        LOG_WARN("das cache: create invalidate callback", K(invalidate_cb));
       }
 
       if (OB_FAIL(ObDMLService::process_delete_row(del_ctdef, del_rtdef, is_skipped, *this))) {
