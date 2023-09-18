@@ -28,6 +28,7 @@ class ObIDASTaskOp;
 class ObIDASTaskResult;
 class ObDASTaskArg;
 class ObRpcDasAsyncAccessCallBack;
+class ObRpcInvalidateCallBack;
 class ObDASRef;
 
 class ObDASTaskFactory
