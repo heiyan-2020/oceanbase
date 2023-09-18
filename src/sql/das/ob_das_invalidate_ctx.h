@@ -10,6 +10,7 @@
 
 #include "lib/lock/ob_thread_cond.h"
 #include "lib/atomic/ob_atomic.h"
+#include "lib/oblog/ob_log.h"
 #include "lib/oblog/ob_log_module.h"
 
 namespace oceanbase
