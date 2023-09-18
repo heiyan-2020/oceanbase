@@ -28,7 +28,6 @@
 #include "ob_trans_hashmap.h"
 #include "storage/tx/ob_trans_define.h"
 #include "common/ob_simple_iterator.h"
-#include "sql/das/ob_das_invalidate_ctx.h"
 
 namespace oceanbase
 {
@@ -221,6 +220,44 @@ struct ObTxPart
   TO_STRING_KV(K_(id), K_(addr), K_(epoch), K_(first_scn), K_(last_scn), K_(last_touch_ts));
   OB_UNIS_VERSION(1);
 };
+
+
+class ObInvalidateCtx
+{
+public:
+  ObInvalidateCtx() : succ_(false) {
+    int ret = OB_SUCCESS;
+    if (OB_FAIL(cond_.init(ObWaitEventIds::DAS_ASYNC_RPC_LOCK_WAIT))) {
+      LOG_ERROR("Failed to init thread cond", K(ret), K(MTL_ID()));
+    }
+  }
+
+  void set_succ() {
+    ObThreadCondGuard guard(cond_);
+    ATOMIC_STORE(&succ_, 1);
+    cond_.signal();
+  }
+
+  int32_t get_succ() {
+    return ATOMIC_LOAD(&succ_);
+  }
+
+  int wait_until_succ() {
+    int ret = OB_SUCCESS;
+    ObThreadCondGuard guard(cond_);
+    while (OB_SUCC(ret) && get_succ() == 0) {
+      if (OB_FAIL(cond_.wait())) {
+        LOG_WARN("das cache: failed to wait invalidate");
+      }
+    }
+    return ret;
+  }
+
+private:
+  common::ObThreadCond cond_;
+  int32_t succ_; // It would be a number in general case where txn may wait for multiple invalidate msgs.
+};
+
 
 typedef ObSEArray<ObTxPart, 4> ObTxPartList;
 typedef ObRefList<ObTxPart, 4> ObTxPartRefList;
