@@ -15,6 +15,9 @@
 #include "lib/list/ob_obj_store.h"
 #include "sql/das/ob_das_task.h"
 #include "sql/das/ob_das_cache.h"
+#include "storage/tx/ob_trans_define_v4.h"
+
+
 namespace oceanbase
 {
 namespace sql
