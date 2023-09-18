@@ -638,7 +638,7 @@ public:
     return state_ >= State::SUB_PREPARING
       && state_ <= State::SUB_ROLLBACKED;
   }
-  ObInvalidateCtx *get_invalidate_ctx() { return invalidate_ctx_; }
+  ObInvalidateCtx *get_invalidate_ctx() { return &invalidate_ctx_; }
   bool is_aborted() const { return state_ == State::ABORTED; }
   bool is_tx_timeout() { return ObClockGenerator::getClock() > expire_ts_; }
   bool is_tx_commit_timeout() { return ObClockGenerator::getClock() > commit_expire_ts_;}

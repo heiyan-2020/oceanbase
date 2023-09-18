@@ -29,7 +29,7 @@ public:
 
   void set_succ() {
     ObThreadCondGuard guard(cond_);
-    ATOMIC_STORE(succ_, 1);
+    ATOMIC_STORE(&succ_, 1);
     cond_.signal();
   }
 
