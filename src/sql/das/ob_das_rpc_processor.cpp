@@ -270,7 +270,7 @@ int ObRpcInvalidateCallBack::process()
   if (OB_FAIL(get_rcode())) {
     LOG_WARN("das cache: async invalidate failed", K(get_rcode()), K_(result));
   }
-  context_->set_succ(1);
+//  context_->set_succ(1);
   return ret;
 }
 

@@ -246,8 +246,9 @@ public:
     int ret = OB_SUCCESS;
     ObThreadCondGuard guard(cond_);
     while (OB_SUCC(ret) && get_succ() == 0) {
+      TRANS_LOG(TRACE, "das cache: wait");
       if (OB_FAIL(cond_.wait())) {
-        TRANS_LOG(TRACE, "wait failed");
+        TRANS_LOG(TRACE, "das cache: wait failed");
       }
     }
     return ret;
