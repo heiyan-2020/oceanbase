@@ -28,11 +28,14 @@
 #include "ob_trans_hashmap.h"
 #include "storage/tx/ob_trans_define.h"
 #include "common/ob_simple_iterator.h"
+#include "sql/das/ob_das_invalidate_ctx.h"
 
 namespace oceanbase
 {
 namespace transaction
 {
+
+using namespace sql;
 
 class ObTxSchedulerStat;
 
@@ -486,6 +489,8 @@ private:
   ObTxTimeoutTask commit_task_;     // commit retry task
   ObXACtx *xa_ctx_;                 // xa context
   ObTransTraceLog tlog_;
+
+  ObInvalidateCtx invalidate_ctx_;
 #ifndef NDEBUG
   struct DLink {
     DLink(): next_(this), prev_(this) {}
@@ -633,6 +638,7 @@ public:
     return state_ >= State::SUB_PREPARING
       && state_ <= State::SUB_ROLLBACKED;
   }
+  ObInvalidateCtx *get_invalidate_ctx() { return invalidate_ctx_; }
   bool is_aborted() const { return state_ == State::ABORTED; }
   bool is_tx_timeout() { return ObClockGenerator::getClock() > expire_ts_; }
   bool is_tx_commit_timeout() { return ObClockGenerator::getClock() > commit_expire_ts_;}

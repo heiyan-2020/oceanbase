@@ -421,6 +421,9 @@ int ObSqlTransControl::do_end_trans_(ObSQLSessionInfo *session,
   transaction::ObTxDesc *&tx_ptr = session->get_tx_desc();
   bool is_detector_exist = false;
   int tmp_ret = OB_SUCCESS;
+
+  LOG_WARN("das cache: txn", K(tx_ptr->get_invalidate_ctx()->get_succ()));
+
   if (OB_ISNULL(MTL(share::detector::ObDeadLockDetectorMgr*))) {
     tmp_ret = OB_BAD_NULL_ERROR;
     DETECT_LOG(WARN, "MTL ObDeadLockDetectorMgr is NULL", K(tmp_ret), K(tx_ptr->tid()));
