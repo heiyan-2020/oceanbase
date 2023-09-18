@@ -228,7 +228,7 @@ public:
   ObInvalidateCtx() : succ_(false) {
     int ret = OB_SUCCESS;
     if (OB_FAIL(cond_.init(ObWaitEventIds::DAS_ASYNC_RPC_LOCK_WAIT))) {
-      LOG_ERROR("Failed to init thread cond", K(ret), K(MTL_ID()));
+      TRANS_LOG(TRACE, "init cond failed");
     }
   }
 
@@ -247,7 +247,7 @@ public:
     ObThreadCondGuard guard(cond_);
     while (OB_SUCC(ret) && get_succ() == 0) {
       if (OB_FAIL(cond_.wait())) {
-        LOG_WARN("das cache: failed to wait invalidate");
+        TRANS_LOG(TRACE, "wait failed");
       }
     }
     return ret;
