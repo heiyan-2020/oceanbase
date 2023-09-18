@@ -422,7 +422,9 @@ int ObSqlTransControl::do_end_trans_(ObSQLSessionInfo *session,
   bool is_detector_exist = false;
   int tmp_ret = OB_SUCCESS;
 
-  LOG_WARN("das cache: txn", K(tx_ptr->get_invalidate_ctx()->get_succ()));
+  if (OB_FAIL(tx_ptr->get_invalidate_ctx()->wait_until_succ())) {
+    LOG_WARN("das cache: tx wait failed");
+  }
 
   if (OB_ISNULL(MTL(share::detector::ObDeadLockDetectorMgr*))) {
     tmp_ret = OB_BAD_NULL_ERROR;

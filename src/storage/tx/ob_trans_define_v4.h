@@ -225,16 +225,16 @@ struct ObTxPart
 class ObInvalidateCtx
 {
 public:
-  ObInvalidateCtx() : succ_(false) {
+  ObInvalidateCtx() : succ_(true) {
     int ret = OB_SUCCESS;
     if (OB_FAIL(cond_.init(ObWaitEventIds::DAS_ASYNC_RPC_LOCK_WAIT))) {
       TRANS_LOG(TRACE, "init cond failed");
     }
   }
 
-  void set_succ() {
+  void set_succ(int32_t val) {
     ObThreadCondGuard guard(cond_);
-    ATOMIC_STORE(&succ_, 1);
+    ATOMIC_STORE(&succ_, val);
     cond_.signal();
   }
 

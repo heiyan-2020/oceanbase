@@ -28,12 +28,13 @@ public:
   virtual ~ObDASRpcProxy() {}
   //stream rpc interface
   RPC_S(@PR5 remote_sync_access, obrpc::OB_DAS_SYNC_ACCESS, (sql::ObDASTaskArg), sql::ObDASTaskResp);
-  RPC_S(@PR5 invalidate, obrpc::OB_DAS_INVALIDATE, (sql::ObDASInvalidateReq), sql::ObDASInvalidateRes);
   // sync rpc for das task result
   RPC_S(@PR5 sync_fetch_das_result, obrpc::OB_DAS_SYNC_FETCH_RESULT, (sql::ObDASDataFetchReq), sql::ObDASDataFetchRes);
   // async rpc to erase das task result
   RPC_AP(@PR5 async_erase_das_result, obrpc::OB_DAS_ASYNC_ERASE_RESULT, (sql::ObDASDataEraseReq));
   RPC_AP(@PR5 das_async_access, obrpc::OB_DAS_ASYNC_ACCESS, (sql::ObDASTaskArg), sql::ObDASTaskResp);
+
+  RPC_AP(@PR5 invalidate, obrpc::OB_DAS_INVALIDATE, (sql::ObDASInvalidateReq), sql::ObDASInvalidateRes);
 };
 
 }  // namespace obrpc

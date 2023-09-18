@@ -18,6 +18,7 @@
 #include "sql/engine/dml/ob_dml_service.h"
 #include "sql/engine/dml/ob_trigger_handler.h"
 #include "sql/engine/expr/ob_expr_calc_partition_id.h"
+#include "storage/tx/ob_trans_define_v4.h"
 
 namespace oceanbase
 {
@@ -264,6 +265,7 @@ OB_INLINE int ObTableDeleteOp::delete_row_to_das()
     DelRtDefArray &rtdefs = del_rtdefs_.at(i);
     bool is_skipped = false;
     ObRowkey rowkey;
+    ObRpcInvalidateCallBack* invalidate_cb = nullptr;
     for (int64_t j = 0; OB_SUCC(ret) && j < ctdefs.count(); ++j) {
       //delete each table with fetched row
       const ObDelCtDef &del_ctdef = *ctdefs.at(j);
@@ -274,8 +276,9 @@ OB_INLINE int ObTableDeleteOp::delete_row_to_das()
 
       if (del_ctdef.das_ctdef_.use_row_cache_ && !del_ctdef.is_primary_index_) {
         ObSQLSessionInfo *session = dml_rtctx_.get_exec_ctx().get_my_session();
-        ObRpcInvalidateCallBack* invalidate_cb = nullptr;
-        dml_rtctx_.das_ref_.get_das_factory().create_invalidate_async_cb(invalidate_cb, session->get_tx_desc()->get_invalidate_ctx());
+        transaction::ObInvalidateCtx *ctx = session->get_tx_desc()->get_invalidate_ctx();
+        ctx->set_succ(0);
+        dml_rtctx_.das_ref_.get_das_factory().create_invalidate_async_cb(invalidate_cb, ctx);
         LOG_WARN("das cache: create invalidate callback", K(invalidate_cb));
       }
 
@@ -291,7 +294,7 @@ OB_INLINE int ObTableDeleteOp::delete_row_to_das()
         LOG_WARN("insert row with das failed", K(ret));
       } else if (del_ctdef.das_ctdef_.use_row_cache_ && del_ctdef.is_primary_index_ && OB_FAIL(extract_rowkey(tablet_loc, del_ctdef, rowkey))) {
         LOG_WARN("extract rowkey failed", K(ret));
-      } else if (del_ctdef.das_ctdef_.use_row_cache_ && !del_ctdef.is_primary_index_ && MTL(ObDataAccessService *)->invalidate_row(MTL_ID(), tablet_loc, rowkey)) {
+      } else if (del_ctdef.das_ctdef_.use_row_cache_ && !del_ctdef.is_primary_index_ && MTL(ObDataAccessService *)->invalidate_row(MTL_ID(), tablet_loc, rowkey, invalidate_cb)) {
         LOG_WARN("invalidate row failed", K(ret));
       } else if (need_after_row_process(del_ctdef) && OB_FAIL(dml_modify_rows_.push_back(modify_row))) {
         LOG_WARN("failed to push dml modify row to modified row list", K(ret));

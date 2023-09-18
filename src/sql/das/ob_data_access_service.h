@@ -26,7 +26,10 @@ class ObDASTaskArg;
 class ObDASTaskResp;
 class ObPhyTableLocation;
 class ObDASExtraData;
+class ObRpcInvalidateCallBack;
+
 class ObDataAccessService
+
 {
 public:
   ObDataAccessService();
@@ -54,7 +57,7 @@ public:
                         const ObIDASTaskOp *task_op,
                         ObDASExtraData *&extra_result);
   int process_task_resp(ObDASRef &das_ref, const ObDASTaskResp &task_resp, const common::ObSEArray<ObIDASTaskOp*, 2> &task_ops);
-  int invalidate_row(uint64_t tenant_id, ObDASTabletLoc *tablet_loc, ObRowkey& rowkey);
+  int invalidate_row(uint64_t tenant_id, ObDASTabletLoc *tablet_loc, ObRowkey& rowkey, ObRpcInvalidateCallBack *cb);
 private:
   int execute_dist_das_task(ObDASRef &das_ref,
       ObDasAggregatedTasks &task_ops, bool async = true);

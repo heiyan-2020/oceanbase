@@ -433,8 +433,8 @@ int ObDataAccessService::do_async_remote_das_task(
     // RPC fail, add task's LSID to trans_result
     // indicate some transaction participant may touched
     for (int i = 0; i < task_ops.count(); i++) {
-      session->get_trans_result().add_touched_ls(task_ops.at(i)->get_ls_id());
     }
+      session->get_trans_result().add_touched_ls(task_ops.at(i)->get_ls_id());
   }
   if (OB_FAIL(ret)) {
     if (nullptr != das_async_cb) {
@@ -592,10 +592,9 @@ int ObDataAccessService::remove_if_cache_hit(ObDASRef &das_ref, ObDasAggregatedT
   return ret;
 }
 
-int ObDataAccessService::invalidate_row(uint64_t tenant_id, ObDASTabletLoc *tablet_loc, ObRowkey& rowkey) {
+int ObDataAccessService::invalidate_row(uint64_t tenant_id, ObDASTabletLoc *tablet_loc, ObRowkey& rowkey, ObRpcInvalidateCallBack *cb) {
   int ret = OB_SUCCESS;
   ObDASInvalidateReq task_arg;
-  ObDASInvalidateRes task_resp;
 
   task_arg.init(tenant_id, tablet_loc->tablet_id_, rowkey);
 
@@ -603,11 +602,11 @@ int ObDataAccessService::invalidate_row(uint64_t tenant_id, ObDASTabletLoc *tabl
            .to(tablet_loc->server_)
            .by(tenant_id)
            .timeout(1000000)
-           .invalidate(task_arg, task_resp))) {
+           .invalidate(task_arg, cb))) {
     LOG_WARN("[das cache] invalidate failed");
   }
 
-  LOG_WARN("[das cache] [debug] send invalidate rpc", K(ret), K(task_resp.succ_));
+  LOG_WARN("das cache: async call", K(ret));
 
   return ret;
 }
