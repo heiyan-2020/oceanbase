@@ -10,6 +10,7 @@
 
 #include "lib/lock/ob_thread_cond.h"
 #include "lib/atomic/ob_atomic.h"
+#include "sql/das/ob_das_cache.h"
 
 namespace oceanbase
 {
