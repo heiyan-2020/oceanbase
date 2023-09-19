@@ -244,6 +244,14 @@ public:
 
   int wait_until_succ() {
     int ret = OB_SUCCESS;
+    int retry_times = 100;
+    int32_t tmp_res = 1;
+    while (retry_times > 0 && (tmp_res = get_succ()) == 0) {}
+
+    if (tmp_res == 1) {
+      return ret;
+    }
+
     ObThreadCondGuard guard(cond_);
     while (OB_SUCC(ret) && get_succ() == 0) {
       if (OB_FAIL(cond_.wait())) {
