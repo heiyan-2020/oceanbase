@@ -284,7 +284,7 @@ OB_INLINE int ObTableDeleteOp::delete_row_to_das()
 
         ObDASTabletLoc *global_index_tablet_loc = nullptr;
         calc_tablet_loc(*ctdefs.at(j+1), rtdefs.at(j+1), global_index_tablet_loc);
-        MTL(ObDataAccessService *)->invalidate_row(MTL_ID(), tablet_loc, rowkey, invalidate_cb);
+        MTL(ObDataAccessService *)->invalidate_row(MTL_ID(), global_index_tablet_loc, rowkey, invalidate_cb);
         LOG_WARN("das cache: invalidated");
       }
 
