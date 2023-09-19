@@ -248,6 +248,8 @@ public:
     int32_t tmp_res = 1;
     while (retry_times > 0 && (tmp_res = get_succ()) == 0) {}
 
+    LOG_WARN("das cache: spin failed");
+
     if (tmp_res == 1) {
       return ret;
     }
@@ -258,6 +260,9 @@ public:
         TRANS_LOG(TRACE, "das cache: wait failed");
       }
     }
+
+    LOG_WARN("das cache: wait succ");
+
     return ret;
   }
 
