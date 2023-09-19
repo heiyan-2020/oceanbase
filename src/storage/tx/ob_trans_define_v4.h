@@ -248,7 +248,7 @@ public:
     int32_t tmp_res = 1;
     while (retry_times > 0 && (tmp_res = get_succ()) == 0) {}
 
-    LOG_WARN("das cache: spin failed");
+    TRANS_LOG(WARN, "das cache: spin failed");
 
     if (tmp_res == 1) {
       return ret;
@@ -261,7 +261,7 @@ public:
       }
     }
 
-    LOG_WARN("das cache: wait succ");
+    TRANS_LOG(WARN, "das cache: wait succ");
 
     return ret;
   }
