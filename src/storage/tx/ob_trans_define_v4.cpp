@@ -1534,7 +1534,7 @@ int ObInvalidateCtx::wait_until_succ() {
   int ret = OB_SUCCESS;
   int retry_times = 100;
   int32_t tmp_res = 1;
-  while (retry_times > 0 && (tmp_res = get_succ()) == 0) {}
+  while (retry_times-- > 0 && (tmp_res = get_succ()) == 0) {}
 
   TRANS_LOG(WARN, "das cache: spin finished", K(retry_times), K(tmp_res));
 
