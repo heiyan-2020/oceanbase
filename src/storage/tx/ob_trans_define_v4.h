@@ -232,7 +232,7 @@ public:
     }
   }
 
-  void set_succ(int32_t val)
+  void set_succ(int32_t val);
 
   int32_t get_succ() {
     return ATOMIC_LOAD(&succ_);
