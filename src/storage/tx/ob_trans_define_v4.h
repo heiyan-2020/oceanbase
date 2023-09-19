@@ -232,39 +232,13 @@ public:
     }
   }
 
-  void set_succ(int32_t val) {
-    ObThreadCondGuard guard(cond_);
-    ATOMIC_STORE(&succ_, val);
-    cond_.signal();
-  }
+  void set_succ(int32_t val)
 
   int32_t get_succ() {
     return ATOMIC_LOAD(&succ_);
   }
 
-  int wait_until_succ() {
-    int ret = OB_SUCCESS;
-    int retry_times = 100;
-    int32_t tmp_res = 1;
-    while (retry_times > 0 && (tmp_res = get_succ()) == 0) {}
-
-    TRANS_LOG(WARN, "das cache: spin failed");
-
-    if (tmp_res == 1) {
-      return ret;
-    }
-
-    ObThreadCondGuard guard(cond_);
-    while (OB_SUCC(ret) && get_succ() == 0) {
-      if (OB_FAIL(cond_.wait())) {
-        TRANS_LOG(TRACE, "das cache: wait failed");
-      }
-    }
-
-    TRANS_LOG(WARN, "das cache: wait succ");
-
-    return ret;
-  }
+  int wait_until_succ();
 
 private:
   common::ObThreadCond cond_;
