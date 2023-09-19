@@ -274,12 +274,18 @@ OB_INLINE int ObTableDeleteOp::delete_row_to_das()
       ObDMLModifyRowNode modify_row(this, &del_ctdef, &del_rtdef, ObDmlEventType::DE_DELETING);
       bool is_skipped = false;
 
-      if (del_ctdef.das_ctdef_.use_row_cache_ && !del_ctdef.is_primary_index_) {
+      if (del_ctdef.das_ctdef_.use_row_cache_ && ctdefs.count() > 1 && del_ctdef.is_primary_index_) {
         ObSQLSessionInfo *session = dml_rtctx_.get_exec_ctx().get_my_session();
         transaction::ObInvalidateCtx *ctx = session->get_tx_desc()->get_invalidate_ctx();
         ctx->set_succ(0);
         dml_rtctx_.das_ref_.get_das_factory().create_invalidate_async_cb(invalidate_cb, ctx);
-        LOG_WARN("das cache: create invalidate callback", K(invalidate_cb));
+
+        extract_rowkey(tablet_loc, del_ctdef, rowkey);
+
+        ObDASTabletLoc *global_index_tablet_loc = nullptr;
+        calc_tablet_loc(*ctdefs.at(j+1), rtdefs.at(j+1), global_index_tablet_loc);
+        MTL(ObDataAccessService *)->invalidate_row(MTL_ID(), tablet_loc, rowkey, invalidate_cb);
+        LOG_WARN("das cache: invalidated");
       }
 
       if (OB_FAIL(ObDMLService::process_delete_row(del_ctdef, del_rtdef, is_skipped, *this))) {
@@ -292,10 +298,6 @@ OB_INLINE int ObTableDeleteOp::delete_row_to_das()
         LOG_WARN("calc partition key failed", K(ret));
       } else if (OB_FAIL(ObDMLService::delete_row(del_ctdef, del_rtdef, tablet_loc, dml_rtctx_, modify_row.old_row_))) {
         LOG_WARN("insert row with das failed", K(ret));
-      } else if (del_ctdef.das_ctdef_.use_row_cache_ && del_ctdef.is_primary_index_ && OB_FAIL(extract_rowkey(tablet_loc, del_ctdef, rowkey))) {
-        LOG_WARN("extract rowkey failed", K(ret));
-      } else if (del_ctdef.das_ctdef_.use_row_cache_ && !del_ctdef.is_primary_index_ && MTL(ObDataAccessService *)->invalidate_row(MTL_ID(), tablet_loc, rowkey, invalidate_cb)) {
-        LOG_WARN("invalidate row failed", K(ret));
       } else if (need_after_row_process(del_ctdef) && OB_FAIL(dml_modify_rows_.push_back(modify_row))) {
         LOG_WARN("failed to push dml modify row to modified row list", K(ret));
       } else if (!MY_SPEC.del_ctdefs_.at(0).at(0)->has_instead_of_trigger_) {
