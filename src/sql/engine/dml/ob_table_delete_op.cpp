@@ -266,6 +266,7 @@ OB_INLINE int ObTableDeleteOp::delete_row_to_das()
     bool is_skipped = false;
     ObRowkey rowkey;
     ObRpcInvalidateCallBack* invalidate_cb = nullptr;
+    ObDASTabletLoc *global_index_tablet_loc = nullptr;
     for (int64_t j = 0; OB_SUCC(ret) && j < ctdefs.count(); ++j) {
       //delete each table with fetched row
       const ObDelCtDef &del_ctdef = *ctdefs.at(j);
@@ -286,6 +287,8 @@ OB_INLINE int ObTableDeleteOp::delete_row_to_das()
         calc_tablet_loc(*ctdefs.at(j+1), rtdefs.at(j+1), global_index_tablet_loc);
         MTL(ObDataAccessService *)->invalidate_row(MTL_ID(), global_index_tablet_loc, rowkey, invalidate_cb);
         LOG_WARN("das cache: invalidated");
+      } else if (del_ctdef.das_ctdef_.use_row_cache_ && ctdefs.count() > 1 && !del_ctdef.is_primary_index_) {
+        tablet_loc = global_index_tablet_loc;
       }
 
       if (OB_FAIL(ObDMLService::process_delete_row(del_ctdef, del_rtdef, is_skipped, *this))) {
@@ -294,7 +297,7 @@ OB_INLINE int ObTableDeleteOp::delete_row_to_das()
         //this row has been skipped, so can not write to DAS buffer(include its global index)
         //so need to break this loop
         break;
-      } else if (OB_FAIL(calc_tablet_loc(del_ctdef, del_rtdef, tablet_loc))) {
+      } else if (tablet_loc == nullptr && OB_FAIL(calc_tablet_loc(del_ctdef, del_rtdef, tablet_loc))) {
         LOG_WARN("calc partition key failed", K(ret));
       } else if (OB_FAIL(ObDMLService::delete_row(del_ctdef, del_rtdef, tablet_loc, dml_rtctx_, modify_row.old_row_))) {
         LOG_WARN("insert row with das failed", K(ret));
